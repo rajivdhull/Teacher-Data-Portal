@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+(function(){
+  var V='2026072601';
+  if(localStorage.getItem('portal_v')!==V){
+    localStorage.setItem('portal_v',V);
+    if(performance.navigation&&performance.navigation.type!==1){
+      window.location.href=window.location.pathname+'?v='+V;
+    }
+  }
+})();
+</script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gurugram Block Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2342;--blue:#1e5fc0;--sky:#3b82f6;--accent:#f59e0b;
+  --green:#16a34a;--gbg:#dcfce7;--glt:#f0fdf4;
+  --red:#dc2626;--rbg:#fee2e2;
+  --yellow:#ca8a04;--ybg:#fef9c3;
+  --purple:#7c3aed;--pbg:#ede9fe;
+  --surface:#f8fafc;--white:#fff;--border:#e2e8f0;
+  --text:#0f172a;--muted:#64748b;--light:#94a3b8;
+  --r:10px;--rl:16px;--sh:0 1px 3px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);font-size:14px}
+input,select,textarea,button{font-family:inherit}
+
+/* PIN */
+.pin-ov{position:fixed;inset:0;background:rgba(15,35,66,.93);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.pin-box{background:#fff;border-radius:var(--rl);padding:32px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.pin-logo{width:52px;height:52px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--navy);margin:0 auto 16px}
+.pin-dots{display:flex;justify-content:center;gap:10px;margin-bottom:20px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all .2s}
+.pin-dot.on{background:var(--navy);border-color:var(--navy)}
+.pin-dot.err{background:var(--red);border-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pkey{padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);font-size:18px;font-weight:500;cursor:pointer;transition:all .15s}
+.pkey:hover{background:var(--navy);color:#fff}
+.pin-err{color:var(--red);font-size:12px;margin-top:10px;min-height:18px}
+
+/* CONN */
+.conn{display:flex;align-items:center;justify-content:space-between;padding:6px 22px;font-size:12px;font-weight:500}
+.c-ok{background:#dcfce7;color:#15803d;border-bottom:1px solid #bbf7d0}
+.c-err{background:#fee2e2;color:#b91c1c;border-bottom:1px solid #fca5a5}
+.c-load{background:#fef9c3;color:#a16207;border-bottom:1px solid #fde68a}
+.cdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
+.cdot-ok{background:#16a34a}.cdot-err{background:#dc2626}
+.cdot-load{background:#f59e0b;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* HEADER */
+.hdr{background:var(--navy);color:#fff;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hlogo{width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--navy);flex-shrink:0}
+.htitle{font-size:15px;font-weight:600;line-height:1.2}
+.hsub{font-size:11px;color:#94a3b8;margin-top:1px}
+.hbadge{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#fcd34d;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.abtn{background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.5);color:#c4b5fd;padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;margin-left:8px}
+.lbtn{background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);color:#fca5a5;padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;margin-left:6px}
+
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 22px;display:flex;gap:2px;overflow-x:auto}
+.ntab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;white-space:nowrap}
+.ntab:hover{color:var(--text)}.ntab.act{color:var(--blue);border-bottom-color:var(--blue)}
+.ntab.adm{color:var(--purple)}.ntab.adm.act{color:var(--purple);border-bottom-color:var(--purple)}
+.albl{font-size:10px;background:var(--pbg);color:var(--purple);padding:1px 6px;border-radius:8px;margin-left:4px}
+
+.main{max-width:1100px;margin:0 auto;padding:20px 16px}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--sh)}
+.cp{padding:20px}
+
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.sc{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)}
+.slbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.sval{font-size:28px;font-weight:600;font-family:'DM Mono',monospace;line-height:1}
+.ss{font-size:11px;color:var(--light);margin-top:4px}
+.sg-g .sval{color:var(--green)}.sg-r .sval{color:var(--red)}.sg-y .sval{color:var(--yellow)}
+
+/* PROG */
+.pb{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.pf{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--blue),var(--sky));transition:width .6s}
+
+/* TABLE */
+.tw{background:#fff;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--navy);color:#e2e8f0;font-weight:500;padding:10px 13px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border)}.tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:9px 13px;vertical-align:middle}
+.mono{font-family:'DM Mono',monospace;font-size:12px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.bg{background:var(--gbg);color:#15803d}.br{background:var(--rbg);color:#b91c1c}
+.bo{background:#ffedd5;color:#c2410c}.by{background:#fef9c3;color:#854d0e}
+.bb{background:#dbeafe;color:#1d4ed8}.bpu{background:var(--pbg);color:#6d28d9}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dg{background:var(--green)}.dr{background:var(--red)}
+.lnk{font-size:11px;color:var(--blue);text-decoration:none;border:1px solid #bfdbfe;padding:3px 9px;border-radius:6px}
+.ibtn{font-size:11px;border:1px solid var(--border);padding:3px 9px;border-radius:6px;cursor:pointer;background:none;color:var(--muted)}
+.dbtn{font-size:11px;border:1px solid #fca5a5;padding:3px 9px;border-radius:6px;cursor:pointer;background:none;color:var(--red)}
+.emp{padding:40px;text-align:center;color:var(--light);font-size:13px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rfbtn{padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);background:#fff;font-size:12px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:5px}
+.rfbtn:hover{background:var(--surface)}
+.xbtn{padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.xbtn:hover{background:#1a3a6b}
+.fbr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.fbr select,.fbr input{padding:7px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:#fff;color:var(--text);outline:none}
+.fbt{padding:7px 13px;border-radius:var(--r);border:1px solid var(--border);background:#fff;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted)}
+.fbt.act,.fbt:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sp1{flex:1}
+
+/* SUBMIT FORM */
+.fw{max-width:700px;margin:0 auto}
+
+/* Step indicator */
+.steps{display:flex;align-items:center;margin:16px 0 22px;overflow-x:auto;gap:0}
+.sdot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;transition:all .3s}
+.sdot.done{background:var(--green);color:#fff}
+.sdot.active{background:var(--navy);color:#fff}
+.sdot.todo{background:var(--border);color:var(--muted)}
+.slbl2{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;transition:color .3s}
+.sline{flex:1;height:2px;min-width:16px;border-radius:1px;transition:background .4s}
+
+/* Form fields */
+.fgrp{margin-bottom:16px}
+.fgrp label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
+.fgrp label .req{color:var(--red)}
+.fgrp input,.fgrp select,.fgrp textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border-color .15s}
+.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.fgrp select optgroup{font-weight:600;color:var(--muted)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* Data grid */
+.dgw{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r)}
+.dg2{width:100%;border-collapse:collapse;font-size:12px}
+.dg2 th{background:var(--navy);color:#e2e8f0;font-size:10px;font-weight:500;padding:8px 10px;border:1px solid #243856;text-align:center;white-space:nowrap}
+.dg2 .rlbl{background:#f8fafc;font-size:11px;font-weight:600;color:var(--navy);padding:8px 10px;text-align:right;border:1px solid var(--border);white-space:nowrap}
+.dg2 td{border:1px solid var(--border)}
+.dg2 td input,.dg2 td select{width:100%;padding:7px 8px;border:none;font-size:12px;font-family:inherit;background:transparent;outline:none}
+.dg2 td input:focus,.dg2 td select:focus{background:#eff6ff}
+
+/* File upload */
+.fupbox{border:2px dashed var(--border);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;transition:border-color .2s}
+.fupbox:hover{border-color:var(--sky)}
+.fprev{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.fitem{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);font-size:12px;max-width:200px}
+
+/* Form nav */
+.fnav{display:flex;justify-content:space-between;align-items:center;margin-top:22px}
+.btn-g{padding:9px 18px;border:1px solid var(--border);border-radius:var(--r);background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:6px}
+.btn-g:hover{background:var(--surface)}
+.btn-p{padding:9px 22px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px}
+.btn-p:hover{background:#1a3a6b}.btn-p:disabled{opacity:.6;cursor:not-allowed}
+.emsg{background:var(--rbg);color:#b91c1c;padding:9px 13px;border-radius:var(--r);font-size:12px;margin-top:12px;display:none}
+.smsg{background:var(--gbg);color:#15803d;padding:10px 13px;border-radius:var(--r);font-size:13px;font-weight:500;margin-top:12px;display:none}
+
+/* MASTER SHEET */
+.mgrid{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}
+.mnav2{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:6px}
+.mi{padding:10px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:10px;border:none;background:none;width:100%;text-align:left}
+.mi:hover{background:var(--surface);color:var(--text)}.mi.act{background:var(--pbg);color:var(--purple)}
+.msep{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--light);padding:10px 14px 4px}
+.mpanel{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:22px}
+.mpt{font-size:15px;font-weight:600;margin-bottom:4px}
+.mps{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.mpsec{display:none}.mpsec.act{display:block}
+
+/* FORM BUILDER */
+.sec-card{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;background:#fff;margin-bottom:14px}
+.sec-hdr{background:var(--navy);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.sec-hdr input{padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-family:inherit;outline:none;width:100%}
+.sec-hdr input::placeholder{color:rgba(255,255,255,.5)}
+.shbtn{width:26px;height:26px;border:1px solid rgba(255,255,255,.2);border-radius:4px;background:transparent;color:#94a3b8;cursor:pointer;font-size:13px;flex-shrink:0}
+.shbtn:hover{background:rgba(255,255,255,.15);color:#fff}
+.shbtn.del{border-color:#c00;color:#fca5a5;background:rgba(220,38,38,.2)}
+.fld-row{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.fld-num{width:22px;height:22px;background:var(--surface);border:1px solid var(--border);border-radius:4px;font-size:11px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:7px}
+.fld-main{flex:1;min-width:0}
+.fld-ctrl{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.fld-ctrl input[type=text]{flex:1;min-width:120px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.fld-ctrl input[type=text]:focus{border-color:var(--sky)}
+.fld-ctrl select{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none}
+.fld-ctrl select:focus{border-color:var(--sky)}
+.fcbtn{width:22px;height:22px;border:1px solid var(--border);border-radius:4px;background:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.fcbtn.del{border-color:#fca5a5;background:var(--rbg);color:var(--red);font-size:14px}
+.fld-extra{margin-top:8px;padding:10px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border)}
+.fld-extra-title{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.grid-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.grid-row input{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:11px;font-family:inherit;outline:none}
+.grid-row select{width:90px;padding:5px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;font-family:inherit;outline:none}
+.grid-row .x{width:20px;height:20px;border:1px solid #fca5a5;border-radius:3px;background:var(--rbg);color:var(--red);cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.add-item-row{display:flex;gap:6px;margin-top:6px}
+.add-item-row input{flex:1;padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;outline:none}
+.add-item-row select{padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;outline:none}
+.add-item-row button{padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap}
+.sec-footer{padding:10px 14px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sec-footer input{flex:1;min-width:140px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:inherit;outline:none}
+.sec-footer select{padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:inherit;outline:none}
+.sec-footer button{padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap}
+.add-sec-btn{width:100%;padding:12px;border:2px dashed var(--border);border-radius:var(--rl);background:none;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:14px}
+.add-sec-btn:hover{border-color:var(--navy);color:var(--navy)}
+
+/* Settings rows */
+.srow{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.si{flex:1}.slb{font-size:13px;font-weight:500}.sd{font-size:11px;color:var(--muted);margin-top:2px}
+.sctl{flex-shrink:0;min-width:260px}
+.sctl input,.sctl select,.sctl textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;color:var(--text);outline:none}
+.sctl input:focus,.sctl select:focus{border-color:var(--sky)}
+.savebar{background:var(--pbg);border:1px solid #c4b5fd;border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+.savebar p{font-size:12px;color:var(--purple);font-weight:500;line-height:1.5}
+.savebar button{padding:8px 18px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.sbtn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.sbtn-g{padding:7px 15px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px}
+.sbtn-g:hover{background:#1a3a6b}
+.infobox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:12px;font-size:12px;color:var(--muted);line-height:1.6}
+.infobox strong{color:var(--text)}
+.warnbox{background:var(--ybg);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--yellow);margin-top:10px;line-height:1.5}
+.dangerbox{background:var(--surface);border:1px solid #fca5a5;border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.dangerbox h4{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.dangerbox p{font-size:12px;color:var(--muted);margin-bottom:8px}
+
+/* CE (cluster editor) */
+.ce-col{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.ce-hdr{background:var(--navy);color:#fff;padding:10px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.ce-list{max-height:280px;overflow-y:auto}
+.ce-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border)}
+.ce-item:hover{background:var(--surface)}.ce-item.sel{background:#eff6ff}
+.ce-item input{flex:1;border:none;background:transparent;font-size:13px;font-family:inherit;outline:none;padding:2px 4px}
+.ce-item input:focus{background:#eff6ff;border-radius:4px}
+.cat-span{font-size:10px;padding:2px 6px;border-radius:8px;font-weight:500;flex-shrink:0}
+.xdel{width:22px;height:22px;border:none;background:var(--rbg);color:var(--red);border-radius:4px;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.xdel:hover{background:#fca5a5}
+.ce-add{padding:8px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.ce-add input{padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:inherit;outline:none;width:100%}
+.ce-add input:focus{border-color:var(--sky)}
+.addbtn{width:100%;padding:6px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer}
+.addbtn:hover{background:#1a3a6b}
+.cl-ed{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* Toggle */
+.tog-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px}
+.tog{width:44px;height:24px;border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.tog-knob{position:absolute;top:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+
+/* CF editor */
+.cf-row{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);flex-direction:column}
+.cf-row:last-child{border-bottom:none}
+.cf-row .top{display:flex;align-items:center;gap:8px;width:100%}
+
+/* Modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:var(--rl);padding:22px;max-width:820px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.mhdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.mclose{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.drow{display:flex;border-bottom:1px solid var(--border);padding:7px 0}
+.dlbl{font-size:12px;color:var(--muted);font-weight:500;width:160px;flex-shrink:0}
+.dval{font-size:12px}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;color:#fff}
+.toast.show{opacity:1}
+
+@media(max-width:768px){
+  .sg{grid-template-columns:repeat(2,1fr)}
+  .mgrid{grid-template-columns:1fr}
+  .frow2{grid-template-columns:1fr}
+  .cl-ed{grid-template-columns:1fr}
+  .main{padding:14px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- PIN -->
+<div class="pin-ov" id="pin-ov" style="display:none">
+  <div class="pin-box">
+    <div class="pin-logo" id="pin-logo">DEO</div>
+    <div style="font-size:17px;font-weight:600;margin-bottom:6px">Admin Access</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Enter 4-digit PIN</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pkey" onclick="pk('1')">1</button><button class="pkey" onclick="pk('2')">2</button><button class="pkey" onclick="pk('3')">3</button>
+      <button class="pkey" onclick="pk('4')">4</button><button class="pkey" onclick="pk('5')">5</button><button class="pkey" onclick="pk('6')">6</button>
+      <button class="pkey" onclick="pk('7')">7</button><button class="pkey" onclick="pk('8')">8</button><button class="pkey" onclick="pk('9')">9</button>
+      <button class="pkey" onclick="pk('0')" style="grid-column:2">0</button>
+      <button class="pkey" onclick="pd()" style="color:var(--red)">⌫</button>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <button onclick="document.getElementById('pin-ov').style.display='none'" style="margin-top:14px;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer">Cancel</button>
+  </div>
+</div>
+
+<!-- CONN -->
+<div class="conn c-load" id="conn">
+  <div style="display:flex;align-items:center"><span class="cdot cdot-load" id="cdot"></span><span id="ctxt">Connecting...</span></div>
+  <span id="ctime" style="font-size:11px;opacity:.7"></span>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:13px">
+    <div class="hlogo" id="h-logo">DEO</div>
+    <div><div class="htitle" id="h-title">Rajiv Main Portal</div><div class="hsub" id="h-sub">DEO Gurugram · Haryana</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+    <div class="hbadge" id="h-deadline">Deadline: 25 Mar 2026</div>
+    <button class="abtn" onclick="openPin()" id="aln-btn">Admin Login</button>
+    <button class="lbtn" onclick="alogout()" id="aout-btn" style="display:none">Logout</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav" id="main-nav">
+  <button class="ntab act" onclick="ST('submit')">Submit Report</button>
+  <button class="ntab" onclick="ST('dashboard')">Dashboard</button>
+</div>
+
+<!-- ═══ SUBMIT TAB ═══ -->
+<div id="tab-submit" class="main">
+<div class="fw">
+<div class="card cp">
+  <div style="font-size:17px;font-weight:600;margin-bottom:3px" id="form-heading">Submit Report</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5" id="form-subheading">Fill all required fields and submit your report.</div>
+  <div id="form-steps" style="margin-bottom:20px"></div>
+  <div id="form-body"></div>
+  <div class="emsg" id="ferr"></div>
+  <div class="smsg" id="fsuc"></div>
+  <div class="fnav" style="margin-top:20px">
+    <button class="btn-g" id="fbk" onclick="fBack()" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back
+    </button>
+    <button class="btn-g" onclick="fClear()" id="fclr">Clear</button>
+    <div style="display:flex;gap:10px">
+      <button class="btn-p" id="fnxt" onclick="fNext()">Next<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      <button class="btn-p" id="fsbm" onclick="submitForm()" style="display:none">Submit Report</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══ DASHBOARD TAB ═══ -->
+<div id="tab-dashboard" class="main" style="display:none">
+  <div class="sg" id="stats"></div>
+  <div class="card cp" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+      <span style="font-weight:600;font-size:14px" id="dash-head">Overall Submission Progress</span>
+      <span id="prog-lbl" style="font-size:13px;color:var(--muted);font-family:'DM Mono',monospace"></span>
+    </div>
+    <div class="pb"><div class="pf" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="fbr">
+    <button class="fbt act" id="f-all" onclick="setF('all')">All</button>
+    <button class="fbt" id="f-sub" onclick="setF('submitted')">Submitted</button>
+    <button class="fbt" id="f-pend" onclick="setF('pending')">Pending</button>
+    <select id="f-cl" onchange="fCluster(this.value)" style="min-width:160px"><option value="">All Clusters</option></select>
+    <select id="f-cat" onchange="rTable()" style="min-width:130px">
+      <option value="">All Categories</option>
+      <option value="Sr. Sec.">Sr. Secondary</option>
+      <option value="High">High</option>
+      <option value="Middle">Middle</option>
+      <option value="Primary">Primary</option>
+    </select>
+    <input type="text" id="f-srch" placeholder="Search school..." onkeyup="rTable()" style="width:180px">
+    <div class="sp1"></div>
+    <button class="rfbtn" onclick="loadSheets()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.9"/></svg>Refresh
+    </button>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>#</th><th>School</th><th>Category</th><th>Cluster</th><th>Status</th><th>Submitted By</th><th>Submitted At</th></tr></thead>
+      <tbody id="dtbl"></tbody>
+    </table>
+    <div id="demp" class="emp" style="display:none">No schools match.</div>
+  </div>
+</div>
+
+<!-- ═══ RESPONSES TAB (admin) ═══ -->
+<div id="tab-responses" class="main" style="display:none">
+  <div class="fbr">
+    <select id="r-cl" onchange="rResp()" style="min-width:160px"><option value="">All Clusters</option></select>
+    <select id="r-cat" onchange="rResp()" style="min-width:130px">
+      <option value="">All Categories</option>
+      <option value="Sr. Sec.">Sr. Secondary</option><option value="High">High</option>
+      <option value="Middle">Middle</option><option value="Primary">Primary</option>
+    </select>
+    <input type="text" id="r-srch" placeholder="Search..." onkeyup="rResp()" style="width:180px">
+    <div class="sp1"></div>
+    <button class="rfbtn" onclick="loadSheets()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.9"/></svg>Refresh
+    </button>
+    <button class="xbtn" onclick="expFull()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Full
+    </button>
+    <button class="xbtn" style="background:#15803d" onclick="expStatus()">Export Status</button>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>#</th><th>School</th><th>Category</th><th>Cluster</th><th>Submitted By</th><th>Submitted At</th><th>Details</th><th>Delete</th></tr></thead>
+      <tbody id="rtbl"></tbody>
+    </table>
+    <div id="remp" class="emp" style="display:none">No submissions yet.</div>
+  </div>
+</div>
+
+<!-- ═══ MASTER SHEET (admin) ═══ -->
+<div id="tab-master" class="main" style="display:none">
+  <div class="savebar">
+    <div>
+      <p>⚙ <strong>Master Sheet</strong> — Make changes here. Click Save to push to Google Sheets. Submit form updates instantly for all users.</p>
+    </div>
+    <button onclick="saveConfig()" id="save-btn">💾 Save All Changes</button>
+  </div>
+  <div class="mgrid">
+    <div class="mnav2">
+      <div class="msep">Connection</div>
+      <button class="mi act" onclick="showMS('conn',this)"><span style="font-size:15px">🔌</span>Google Sheets Setup</button>
+      <div class="msep">Branding</div>
+      <button class="mi" onclick="showMS('brand',this)"><span style="font-size:15px">🎨</span>Portal Branding</button>
+      <div class="msep">Form Builder</div>
+      <button class="mi" onclick="showMS('fb',this)"><span style="font-size:15px">🧩</span>Form Builder</button>
+      <div class="msep">Schools</div>
+      <button class="mi" onclick="showMS('cls',this)"><span style="font-size:15px">🏫</span>Clusters &amp; Schools</button>
+      <button class="mi" onclick="showMS('cats',this)"><span style="font-size:15px">🔘</span>Enable / Disable Categories</button>
+      <div class="msep">Security</div>
+      <button class="mi" onclick="showMS('pin2',this)"><span style="font-size:15px">🔐</span>Admin PIN</button>
+      <div class="msep">Data</div>
+      <button class="mi" onclick="showMS('danger',this)"><span style="font-size:15px">⚠️</span>Reset / Clear</button>
+    </div>
+
+    <div class="mpanel">
+
+      <!-- CONN -->
+      <div class="mpsec act" id="ms-conn">
+        <div class="mpt">Google Sheets Connection</div>
+        <div class="mps">Paste your Apps Script Web App URL below. After saving, all users connect automatically.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <input id="cfg-ep" placeholder="https://https://script.google.com/u/0/home/projects/1JHNhlVj05ng3zOi8vBPIaqWO52OqZJQxjyV5TuJdxkaYPGALEK-VLpPp/edit" style="flex:1;min-width:240px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none">
+          <button class="btn-p" onclick="testConn()" style="white-space:nowrap">Test Connection</button>
+        </div>
+        <div id="test-res" style="font-size:12px;display:none;padding:8px 12px;border-radius:var(--r);margin-bottom:10px"></div>
+        <div class="warnbox">After connecting, click <strong>Save All Changes</strong> so all devices use the new URL.</div>
+      </div>
+
+      <!-- BRANDING -->
+      <div class="mpsec" id="ms-brand">
+        <div class="mpt">Portal Branding</div>
+        <div class="mps">Changes show instantly in the header. Save to sync to all devices.</div>
+        <div class="srow"><div class="si"><div class="slb">Portal Title</div><div class="sd">Main heading in header</div></div><div class="sctl"><input id="cfg-title" oninput="lBrand()"></div></div>
+        <div class="srow"><div class="si"><div class="slb">Subtitle</div></div><div class="sctl"><input id="cfg-sub" oninput="lBrand()"></div></div>
+        <div class="srow"><div class="si"><div class="slb">Logo Text</div><div class="sd">2–4 chars in coloured box</div></div><div class="sctl"><input id="cfg-logo" maxlength="4" oninput="lBrand()"></div></div>
+        <div class="srow"><div class="si"><div class="slb">Deadline Badge</div></div><div class="sctl"><input id="cfg-dl" oninput="lBrand()"></div></div>
+        <div class="srow"><div class="si"><div class="slb">Dashboard Heading</div></div><div class="sctl"><input id="cfg-dh" oninput="lBrand()"></div></div>
+        <div class="srow"><div class="si"><div class="slb">Form Title</div><div class="sd">Shown on Submit Report page</div></div><div class="sctl"><input id="cfg-fh" oninput="lBrand()"></div></div>
+        <div class="srow"><div class="si"><div class="slb">Form Subtitle</div></div><div class="sctl"><textarea id="cfg-fs" rows="2" oninput="lBrand()" style="resize:vertical;width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"></textarea></div></div>
+      </div>
+
+      <!-- FORM BUILDER -->
+      <div class="mpsec" id="ms-fb">
+        <div class="mpt">Form Builder</div>
+        <div class="mps">Build your submission form. Each section = one page. Schools navigate with Next / Back. Changes reflect in Submit form immediately when you type.</div>
+        <div id="fb-list"></div>
+        <button class="add-sec-btn" onclick="fbAddSec()">+ Add New Section</button>
+        <div class="infobox">
+          <strong>Field types:</strong> Text · Number · Phone · Email · Date · Yes/No · Dropdown · URL/Link · File Upload · Cluster Select · School Select · Data Grid (rows × columns)
+        </div>
+      </div>
+
+      <!-- CLUSTERS -->
+      <div class="mpsec" id="ms-cls">
+        <div class="mpt">Clusters &amp; Schools</div>
+        <div class="mps">Click a cluster name to edit its schools. All changes go live after Save.</div>
+        <div class="cl-ed">
+          <div class="ce-col">
+            <div class="ce-hdr"><span>Clusters (<span id="cl-count">0</span>)</span><span style="font-size:10px;font-weight:400;color:#94a3b8">click to select</span></div>
+            <div class="ce-list" id="cl-list"></div>
+            <div class="ce-add">
+              <input id="new-cl" placeholder="New cluster name..." onkeydown="if(event.key==='Enter')addCl()">
+              <button class="addbtn" onclick="addCl()">+ Add Cluster</button>
+            </div>
+          </div>
+          <div class="ce-col">
+            <div class="ce-hdr"><span>Schools in <span id="sel-cl-lbl">—</span> (<span id="sch-count">0</span>)</span></div>
+            <div class="ce-list" id="sch-list"></div>
+            <div class="ce-add">
+              <input id="new-sch" placeholder="School name..." onkeydown="if(event.key==='Enter')addSch()">
+              <select id="new-sch-cat" style="padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;font-family:inherit;outline:none;width:100%">
+                <option value="Sr. Sec.">Sr. Secondary</option><option value="High">High</option>
+                <option value="Middle">Middle</option><option value="Primary">Primary</option>
+              </select>
+              <button class="addbtn" onclick="addSch()">+ Add School</button>
+            </div>
+          </div>
+        </div>
+        <div class="warnbox" style="margin-top:10px">After Save, updated school list is live for all users immediately.</div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="mpsec" id="ms-cats">
+        <div class="mpt">Enable / Disable Categories</div>
+        <div class="mps">Disable a category to hide those schools from the submission form entirely.</div>
+        <div id="cat-list"></div>
+        <div class="warnbox">Disabled categories are hidden from schools. Click Save to apply.</div>
+      </div>
+
+      <!-- PIN -->
+      <div class="mpsec" id="ms-pin2">
+        <div class="mpt">Admin PIN</div>
+        <div class="mps">Change the 4-digit PIN. Default is 1234.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:400px">
+          <div class="fgrp"><label>New PIN (4 digits)</label><input id="new-pin" type="password" maxlength="4" inputmode="numeric" placeholder="e.g. 9876"></div>
+          <div class="fgrp"><label>Confirm PIN</label><input id="cnf-pin" type="password" maxlength="4" inputmode="numeric" placeholder="Repeat"></div>
+        </div>
+        <button class="btn-p" style="margin-top:14px" onclick="chPin()">Update PIN</button>
+        <div id="pin-msg" style="margin-top:10px;font-size:12px;display:none"></div>
+      </div>
+
+      <!-- DANGER -->
+      <div class="mpsec" id="ms-danger">
+        <div class="mpt">Reset &amp; Clear</div>
+        <div class="mps">These cannot be undone. Export data first.</div>
+        <div class="dangerbox">
+          <h4>Clear Local Cache</h4><p>Clears locally cached submissions. Does NOT delete from Google Sheets.</p>
+          <button onclick="clearLocal()" style="padding:7px 16px;background:var(--rbg);color:var(--red);border:1px solid #fca5a5;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer">Clear Cache</button>
+        </div>
+        <div class="dangerbox" style="margin-top:12px">
+          <h4>Reset Config to Default</h4><p>Resets all settings. Submissions in Google Sheets are unaffected.</p>
+          <button onclick="resetCfg()" style="padding:7px 16px;background:var(--red);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer">Reset Config</button>
+        </div>
+      </div>
+
+    </div><!-- mpanel -->
+  </div><!-- mgrid -->
+</div><!-- tab-master -->
+
+<!-- MODAL -->
+<div class="ov" id="modal" style="display:none" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── SCHOOL DATA ─────────────────────────────────────────────────
+const SD = {"GGSSS JACOBPURA":[{"name":"GGSSS JACOBPURA","category":"Sr. Sec."},{"name":"GSSS GGN VILLAGE","category":"Sr. Sec."},{"name":"GSSS GURGAON BOYS","category":"Sr. Sec."},{"name":"SAK GGSSS GURGAON VILL","category":"Sr. Sec."},{"name":"GGMSPS NO.1 GURGAON","category":"Primary"},{"name":"GGPS GURGAON VILLAGE","category":"Primary"},{"name":"GMSPS SECTOR 14","category":"Primary"},{"name":"Government Model Sanskriti Primary School Bal No. 1","category":"Primary"},{"name":"Government Model Sanskriti Primary School Gurgaon Village","category":"Primary"},{"name":"GPS BAL NO. 2","category":"Primary"},{"name":"GPS POLICE LINE","category":"Primary"},{"name":"GMS SEC-14","category":"Middle"}],"GMSSS SANSKRITI SCHOOL SEC-43":[{"name":"GMSSS SANSKRITI SCHOOL SEC-43","category":"Sr. Sec."},{"name":"GMSPS S.P. GHOSI","category":"Primary"},{"name":"Government Model Sanskriti Primary School DLF PH-1 G- Block","category":"Primary"},{"name":"Government Model Sanskriti Primary School Sushant Lok C-2","category":"Primary"},{"name":"GOVERNMENT PRIMARY SCHOOL DLF PHASE 1 SITE NO 1105","category":"Primary"},{"name":"GPS SANSKRITI MODEL SCHOOL SEC-43","category":"Primary"},{"name":"GPS SUSHANT LOK B-1 ARCADE","category":"Primary"},{"name":"GMS S P GHOSI","category":"Middle"}],"GSSS BASAI":[{"name":"GSSS BASAI","category":"Sr. Sec."},{"name":"GSSS GARAULI KHURD","category":"Sr. Sec."},{"name":"GMSPS Basai","category":"Primary"},{"name":"GMSPS Garauli Kalan","category":"Primary"},{"name":"Government Model Sanskriti Primary School Harsaru","category":"Primary"},{"name":"Government Model Sanskriti Primary School Sector 9","category":"Primary"},{"name":"GPS GAROLI KHURD","category":"Primary"},{"name":"GMS SEC-9","category":"Middle"},{"name":"GHS HARSARU","category":"High"}],"GSSS BHANDWARI":[{"name":"GSSS BHANDWARI","category":"Sr. Sec."},{"name":"GSSS GAWAL PHARI","category":"Sr. Sec."},{"name":"GMSPS BHANDWARI","category":"Primary"},{"name":"GMSPS Gawal Pahari","category":"Primary"},{"name":"GPS BALIYAWAS","category":"Primary"},{"name":"GMS BALIAWAS","category":"Middle"}],"GSSS BHIMGARH KHERI":[{"name":"GSSS BAJGHERA","category":"Sr. Sec."},{"name":"GSSS BHIMGARH KHERI","category":"Sr. Sec."},{"name":"GSSS SARAI ALAWARDI","category":"Sr. Sec."},{"name":"Government Model Sanskriti Primary School Bajghera","category":"Primary"},{"name":"Government Model Sanskriti Primary School Bhim Garh Kheri","category":"Primary"},{"name":"GPS BABUPUR","category":"Primary"},{"name":"GPS DHARAMPUR","category":"Primary"},{"name":"GPS MOHAMMED HERI","category":"Primary"},{"name":"GPS PALAM VIHAR SARAI ALLAWARDI","category":"Primary"},{"name":"GPS SARAI ALAWARDI","category":"Primary"},{"name":"GMS DHARAMPUR","category":"Middle"}],"GSSS CARTERPURI":[{"name":"GSSS CARTERPURI","category":"Sr. Sec."},{"name":"GSSS DUNDAHERA","category":"Sr. Sec."},{"name":"GSSS MOLAHERA","category":"Sr. Sec."},{"name":"GGMSPS Molahera","category":"Primary"},{"name":"Government Model Sanskriti Primary School Carterpuri","category":"Primary"},{"name":"Government Model Sanskriti Primary School Chauma","category":"Primary"},{"name":"Government Model Sanskriti Primary School Dundahera","category":"Primary"},{"name":"Government Model Sanskriti Primary School Molahera-B","category":"Primary"},{"name":"GPS J BLOCK PALAM VIHAR","category":"Primary"},{"name":"GMS CHOUMA","category":"Middle"}],"GSSS CHAKKARPUR":[{"name":"GSSS NATHUPUR","category":"Sr. Sec."},{"name":"PM SHRI GSSS CHAKKARPUR","category":"Sr. Sec."},{"name":"GGPS NATHUPUR","category":"Primary"},{"name":"GMSPS Chakkarpur","category":"Primary"},{"name":"GMSPS Nathupur","category":"Primary"},{"name":"GOVERNMENT PRIMARY SCHOOL V-3108, DLF PHASE - 3","category":"Primary"},{"name":"GOVERNMENT PRIMARY SCHOOL W-3133 DLF PHASE 3 GURUGRAM","category":"Primary"},{"name":"GPS V BLOCK DLF PHASE 3 SITE NO 3107","category":"Primary"},{"name":"GPS W BLOCK DLF PHASE 3 SITE NO 3137","category":"Primary"}],"GSSS DAULTABAD":[{"name":"GSSS DAULTABAD","category":"Sr. Sec."},{"name":"GGPS ARJUN NAGAR","category":"Primary"},{"name":"GMSPS A S GARDEN","category":"Primary"},{"name":"GMSPS Panchawali","category":"Primary"},{"name":"Government Girls Model Sanskriti Primary School Daultabad","category":"Primary"},{"name":"GPS ARJUN NAGAR","category":"Primary"},{"name":"GPS PANWALA","category":"Primary"},{"name":"GPS RAJENDERA PARK","category":"Primary"},{"name":"GPS SURAT NAGAR","category":"Primary"},{"name":"GMS ARJUN NAGAR","category":"Middle"}],"GSSS DHANKOT":[{"name":"GSSS DHANKOT","category":"Sr. Sec."},{"name":"GSSS MANKROLA","category":"Sr. Sec."},{"name":"GSSS SADHRANA","category":"Sr. Sec."},{"name":"GMSPS DHANKOT","category":"Primary"},{"name":"GMSPS SADHRANA","category":"Primary"},{"name":"Government Model Sanskriti Primary School Chandu","category":"Primary"},{"name":"Government Model Sanskriti Primary School Mankrola","category":"Primary"},{"name":"GHS CHANDU","category":"High"}],"GSSS GARHI HARSARU":[{"name":"GSSS GARHI HARSARU","category":"Sr. Sec."},{"name":"GMSPS Dhani Sadhrana","category":"Primary"},{"name":"Government Model Sanskriti Primary School Wazirpur","category":"Primary"},{"name":"GPS BAMROLI","category":"Primary"},{"name":"GPS GARHI HARSARU","category":"Primary"},{"name":"GPS GOPALPUR KHERA","category":"Primary"},{"name":"GPS SALIQ KI DHANI","category":"Primary"},{"name":"GMS WAZIRPUR","category":"Middle"}],"GSSS ISLAMPUR":[{"name":"GSSS ISLAMPUR","category":"Sr. Sec."},{"name":"GMSPS ISLAMPUR","category":"Primary"},{"name":"GMSPS SECTOR 15","category":"Primary"},{"name":"GMSPS Shivaji Nagar","category":"Primary"},{"name":"GMSPS TIKRI","category":"Primary"},{"name":"Government Model Sanskriti Primary School Rosewood City Sector 49","category":"Primary"},{"name":"GMS SHIVAJI NAGAR","category":"Middle"}],"GSSS JHARSA":[{"name":"GSSS JHARSA","category":"Sr. Sec."},{"name":"GMSPS SECTOR 31","category":"Primary"},{"name":"Government Girls Model Sanskriti Primary School Jharsa","category":"Primary"},{"name":"Government Model Sanskriti Primary School Silokhra","category":"Primary"},{"name":"Government Model Sanskriti Primary School Tigra","category":"Primary"},{"name":"GPS INDIRA COLONY","category":"Primary"},{"name":"GPS JHARSA-B","category":"Primary"},{"name":"GPS SAINI KHERA","category":"Primary"},{"name":"GMS SILOKHRA","category":"Middle"},{"name":"GMS TIGRA","category":"Middle"}],"GSSS KADIPUR":[{"name":"GMSSSS ARJUN NAGAR","category":"Sr. Sec."},{"name":"GSSS KADIPUR","category":"Sr. Sec."},{"name":"Government Model Sanskriti Primary School Kadipur","category":"Primary"},{"name":"Government Model Sanskriti Primary School ShivjiPark","category":"Primary"},{"name":"GPS 4/8 MARLA","category":"Primary"},{"name":"GPS MADANPURI","category":"Primary"},{"name":"GPS OM NAGAR","category":"Primary"},{"name":"GHS 4/8 MARLA","category":"High"}],"GSSS KASAN":[{"name":"GGSSS KASAN","category":"Sr. Sec."},{"name":"GSSS KASAN","category":"Sr. Sec."},{"name":"GSSS KHOH","category":"Sr. Sec."},{"name":"GGMSPS KASAN","category":"Primary"},{"name":"GMSPS Kasan","category":"Primary"},{"name":"GPS KHOH","category":"Primary"}],"GSSS KHANDSA":[{"name":"GSSS B.P. KHATOLA","category":"Sr. Sec."},{"name":"GSSS KHANDSA","category":"Sr. Sec."},{"name":"GSSS M P JHARSA","category":"Sr. Sec."},{"name":"GSSS NARSINGPUR","category":"Sr. Sec."},{"name":"GMSPS B.P. KHATOLA","category":"Primary"},{"name":"GMSPS Narsinghpur","category":"Primary"},{"name":"Government Model Sanskriti Primary School Fazilpur Jharsa","category":"Primary"},{"name":"Government Model Sanskriti Primary School Khandsa","category":"Primary"},{"name":"Government Model Sanskriti Primary School Naharpur Rupa","category":"Primary"},{"name":"GPS M P JHARSA","category":"Primary"},{"name":"GMS FAZILPUR JHARSA","category":"Middle"},{"name":"GMS NAHARPUR RUPA","category":"Middle"}],"GSSS KHERKI DAULA":[{"name":"GSSS KHERKI DAULA","category":"Sr. Sec."},{"name":"GSSS NAHARPUR KASAN","category":"Sr. Sec."},{"name":"GGPS KHERKI DAULA","category":"Primary"},{"name":"GMSPS Naharpur Kasan","category":"Primary"},{"name":"Government Model Sanskriti Primary School Sikanderpur Badha","category":"Primary"},{"name":"GPS BADHA","category":"Primary"},{"name":"GPS KHERKI DAULA","category":"Primary"},{"name":"GPS SIHI","category":"Primary"},{"name":"GMS BADHA","category":"Middle"},{"name":"GHS S.P. BADHA","category":"High"}],"GSSS MANESAR":[{"name":"GGSSS MANESAR","category":"Sr. Sec."},{"name":"GSSS MANESAR","category":"Sr. Sec."},{"name":"GGMSPS Manesar","category":"Primary"},{"name":"GMSPS MANESAR","category":"Primary"},{"name":"GPS DHANI SEHRAWAN","category":"Primary"},{"name":"GPS NAINWAL","category":"Primary"},{"name":"GPS PREM NAGAR","category":"Primary"}],"GSSS NAWADA F.PUR":[{"name":"GSSS HAYATPUR","category":"Sr. Sec."},{"name":"GSSS KANKROLA","category":"Sr. Sec."},{"name":"GSSS NAWADA F.PUR","category":"Sr. Sec."},{"name":"GMSPS KANKROLA","category":"Primary"},{"name":"Government Girls Model Sanskriti Primary School Kankrola","category":"Primary"},{"name":"Government Model Sanskriti Primary School Nawada Fatehpur","category":"Primary"},{"name":"GPS CHOKER KI DHANI","category":"Primary"},{"name":"GPS DHORKA","category":"Primary"},{"name":"GPS HAMIRPUR","category":"Primary"},{"name":"GPS HAYATPUR","category":"Primary"},{"name":"GPS MEWKA","category":"Primary"}],"GSSS SARHAUL":[{"name":"GSSS SARHAUL","category":"Sr. Sec."},{"name":"GSSS SUKHRALI","category":"Sr. Sec."},{"name":"GGMSPS SUKHRALI","category":"Primary"},{"name":"GMSPS DLF PH- IV","category":"Primary"},{"name":"GMSPS SARHAUL","category":"Primary"},{"name":"GMSPS SUKHRALI","category":"Primary"},{"name":"GMSPS SUSHANT LOK B 2 MAX","category":"Primary"},{"name":"Government Girls Model Sanskriti Primary School Sarhaul","category":"Primary"},{"name":"GPS SUSHANT LOK A 2","category":"Primary"},{"name":"GPS SUSHANT LOK B-I","category":"Primary"},{"name":"GPS SUSHANT LOK-B-2","category":"Primary"},{"name":"GPS SUSHHANT LOK-A 1","category":"Primary"}],"GSSS SEC-4/7":[{"name":"GGSSS BHIM NAGAR","category":"Sr. Sec."},{"name":"GSSS DHANWAPUR","category":"Sr. Sec."},{"name":"PM SHRI GSSS SEC-4/7","category":"Sr. Sec."},{"name":"GGMSPS BHIM NAGAR","category":"Primary"},{"name":"GMSPS F. G. COLONY","category":"Primary"},{"name":"GMSPS NEW COLONY","category":"Primary"},{"name":"GMSPS R.R. CAMP","category":"Primary"},{"name":"GMSPS SECTOR 4/7","category":"Primary"},{"name":"Government Model Sanskriti Primary School Dhanwapur","category":"Primary"},{"name":"Government Model Sanskriti Primary School SEC-5","category":"Primary"},{"name":"GPS KHERKI MAJRA","category":"Primary"},{"name":"GMS FG COLONY","category":"Middle"},{"name":"GMS KHERKI MAJRA","category":"Middle"},{"name":"GMS NEW COLONY","category":"Middle"}],"GSSS SHIKOHPUR":[{"name":"GSSS NAKHROLA","category":"Sr. Sec."},{"name":"GSSS NAURANGPUR","category":"Sr. Sec."},{"name":"GSSS SHIKOHPUR","category":"Sr. Sec."},{"name":"GGPS NAKHROLA","category":"Primary"},{"name":"GMSPS Rampura","category":"Primary"},{"name":"GMSPS SHIKOHPUR","category":"Primary"},{"name":"Government Model Sanskriti Primary School Nakhrola","category":"Primary"},{"name":"Government Model Sanskriti Primary School Naurangpur","category":"Primary"},{"name":"GPS BAR GUJJAR","category":"Primary"}],"GSSS WAZIRABAD":[{"name":"GGSSS WAZIRABAD","category":"Sr. Sec."},{"name":"GSSS KANHAI","category":"Sr. Sec."},{"name":"GSSS WAZIRABAD","category":"Sr. Sec."},{"name":"GGMSPS KANHAI","category":"Primary"},{"name":"GMSPS SUNCITY SEC 54","category":"Primary"},{"name":"Government Girls Model Sanskriti Primary School Wazirabad","category":"Primary"},{"name":"Government Model Sanskriti Primary School Kanhai","category":"Primary"},{"name":"Government Model Sanskriti Primary School Wazirabad","category":"Primary"},{"name":"GPS GHATTA","category":"Primary"},{"name":"GPS SAMASPUR","category":"Primary"},{"name":"GMS GHATA","category":"Middle"},{"name":"GMS SAMASPUR","category":"Middle"}]};
+
+const CAT_ST={'Sr. Sec.':{bg:'#dbeafe',cl:'#1d4ed8'},'High':{bg:'#ffedd5',cl:'#c2410c'},'Middle':{bg:'#fef9c3',cl:'#854d0e'},'Primary':{bg:'#dcfce7',cl:'#15803d'}};
+function catB(cat){const s=CAT_ST[cat]||{bg:'#f1f5f9',cl:'#64748b'};return `<span class="badge" style="background:${s.bg};color:${s.cl};font-size:10px">${cat||'—'}</span>`;}
+const FT={cluster_select:'Cluster Select',school_select:'School Select',text:'Text',tel:'Phone',email:'Email',number:'Number',url:'URL/Link',date:'Date',textarea:'Long Text',yesno:'Yes/No',select:'Dropdown',file:'File Upload',datagrid:'Data Grid'};
+const TL={number:'Number',text:'Text',url:'Link',yesno:'Yes/No',date:'Date'};
+function uid(){return 'f'+Math.random().toString(36).substr(2,8);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── CONFIG ─────────────────────────────────────────────────────
+const CK='qpr_v6';
+const DEF_SECTIONS=[
+  {id:'s1',title:'School Information',description:'Select your cluster and school, then fill contact details.',
+   fields:[
+    {id:'fld_cl',type:'cluster_select',label:'Select Cluster',required:true},
+    {id:'fld_sc',type:'school_select',label:'Select School',required:true},
+    {id:'fld_nm',type:'text',label:'Name of Submitting Person',required:true},
+    {id:'fld_dg',type:'text',label:'Designation',required:false},
+    {id:'fld_ph',type:'tel',label:'Phone Number',required:true},
+    {id:'fld_lk',type:'url',label:'Upload Link (Drive/OneDrive)',required:false},
+  ]},
+  {id:'s2',title:'Safety Activity Data',description:'Enter count of schools for each activity.',
+   fields:[
+    {id:'fld_g1',type:'datagrid',label:'Activity Data',required:false,
+     columns:[{label:'SDMP Finalized',type:'number'},{label:'Safety Audit – Structural',type:'number'},{label:'Safety Audit – Non-Structural',type:'number'},{label:'Mock Drills Conducted',type:'number'},{label:'Fire Extinguishers Installed',type:'number'},{label:'Inflammable/Toxic Safety',type:'number'},{label:'Building Bye-Laws',type:'number'},{label:'RTE Certificate',type:'number'},{label:'Safety Training',type:'number'},{label:'DM in Curriculum',type:'number'}],
+     rows:[{label:'Done',type:'number'},{label:'Yet to be Done',type:'number'},{label:'Total Schools',type:'number'},{label:'Remarks',type:'text'}]
+    }
+  ]}
+];
+
+function buildDef(){
+  const clusters=Object.keys(SD),schools={};
+  clusters.forEach(c=>{schools[c]=SD[c];});
+  return {
+    ep:'https://script.google.com/macros/s/AKfycbwxtxwGwa-sO59dm_SOjW8RGTJFp4dtAtYO-IUmdXTVC3_eUwkfUb2ZkU_sXyhynXTj1g/exec',
+    pin:'1234',title:'Rajiv Main Portal',sub:'BEO Gurugram · Haryana',
+    logo:'DEO',dl:'Deadline: 25 Mar 2026 · 10:00 AM',dh:'Overall Submission Progress',
+    fh:'Submit Report',fs:'National DM Guidelines · Fill all required fields.',
+    clusters,schools,disabledCats:[],
+    sections:JSON.parse(JSON.stringify(DEF_SECTIONS))
+  };
+}
+
+let cfg=buildDef(), subs={}, curSec=0, fdata={}, uploads={}, driveLinks={}, submitting=false, gridState={};
+let selCl=null, isAdmin=false, dashF='all', dashCl='';
+
+function lcfg(){try{const c=localStorage.getItem(CK);if(c){const p=JSON.parse(c);Object.assign(cfg,p);if(!cfg.sections||!cfg.sections.length)cfg.sections=JSON.parse(JSON.stringify(DEF_SECTIONS));}}catch(e){}}
+function scfg(){try{localStorage.setItem(CK,JSON.stringify(cfg));}catch(e){}}
+lcfg();
+
+// ── API ────────────────────────────────────────────────────────
+function EP(){return(document.getElementById('cfg-ep')||{}).value||cfg.ep||'';}
+async function apiGet(a){
+  const ep=EP();if(!ep)throw new Error('No endpoint');
+  const r=await fetch(ep+'?action='+a+'&t='+Date.now(),{redirect:'follow'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return JSON.parse(await r.text());
+}
+async function apiPost(b){
+  const ep=EP();if(!ep)throw new Error('No endpoint');
+  const r=await fetch(ep,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return JSON.parse(await r.text());
+}
+async function loadRemoteCfg(){
+  if(!cfg.ep)return;
+  try{const r=await apiGet('getConfig');if(r.config){Object.assign(cfg,r.config);if(!cfg.sections||!cfg.sections.length)cfg.sections=JSON.parse(JSON.stringify(DEF_SECTIONS));scfg();applyAll();}}catch(e){}
+}
+async function loadSheets(){
+  setConn('load','Fetching from Google Sheets...');
+  try{
+    const r=await apiGet('getSubmissions');
+    subs=r.submissions||{};
+    setConn('ok','Connected · '+new Date().toLocaleTimeString('en-IN'));
+    rDash();rTable();
+    if(document.getElementById('tab-responses').style.display!=='none')rResp();
+  }catch(e){setConn('err','Cannot reach Google Sheets — '+e.message);}
+}
+function setConn(s,m){
+  const b=document.getElementById('conn'),d=document.getElementById('cdot'),t=document.getElementById('ctxt'),ti=document.getElementById('ctime');
+  b.className='conn c-'+s;d.className='cdot cdot-'+s;t.textContent=m;
+  ti.textContent=s==='ok'?new Date().toLocaleTimeString('en-IN'):'';
+}
+async function testConn(){
+  const ep=(document.getElementById('cfg-ep')||{}).value.trim();
+  if(!ep){showTR('err','Paste the URL first.');return;}
+  cfg.ep=ep;showTR('load','Testing...');
+  try{const r=await fetch(ep+'?action=ping&t='+Date.now());const d=JSON.parse(await r.text());
+    if(d.status==='ok'){scfg();showTR('ok','✅ Connected! Click Save All Changes.');setConn('ok','Connected');}
+    else showTR('err','Unexpected: '+JSON.stringify(d));
+  }catch(e){showTR('err','Failed: '+e.message+'. Check "Who has access" = Anyone.');}
+}
+function showTR(t,m){const el=document.getElementById('test-res');el.style.display='block';
+  const s={ok:'color:#15803d;background:#dcfce7',err:'color:#b91c1c;background:#fee2e2',load:'color:#a16207;background:#fef9c3'};
+  el.style.cssText='font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:8px;'+s[t];el.textContent=m;
+}
+
+// ── SAVE CONFIG ──────────────────────────────────────────────
+async function saveConfig(){
+  rBrand();cfg.ep=(document.getElementById('cfg-ep')||{}).value||cfg.ep;
+  scfg();applyAll();
+  const btn=document.getElementById('save-btn');btn.textContent='Saving...';btn.disabled=true;
+  if(cfg.ep){
+    try{await apiPost({action:'saveConfig',config:cfg});toast('Saved to Google Sheets! All users see changes.');btn.textContent='✓ Saved!';}
+    catch(e){toast('Saved locally (Sheets unreachable)');btn.textContent='💾 Save All Changes';}
+  }else{toast('Saved locally.');btn.textContent='💾 Save All Changes';}
+  setTimeout(()=>{btn.textContent='💾 Save All Changes';btn.disabled=false;},3000);
+}
+
+// ── APPLY CONFIG ──────────────────────────────────────────────
+function applyAll(){applyBrand();rDash();rTable();rFormSteps();rFormSection();}
+function rBrand(){
+  const g=id=>(document.getElementById(id)||{}).value||'';
+  if(g('cfg-title'))cfg.title=g('cfg-title');if(g('cfg-sub'))cfg.sub=g('cfg-sub');
+  if(g('cfg-logo'))cfg.logo=g('cfg-logo');if(g('cfg-dl'))cfg.dl=g('cfg-dl');
+  if(g('cfg-dh'))cfg.dh=g('cfg-dh');if(g('cfg-fh'))cfg.fh=g('cfg-fh');
+  if(g('cfg-fs'))cfg.fs=g('cfg-fs');
+}
+function applyBrand(){
+  document.getElementById('h-title').textContent=cfg.title;
+  document.getElementById('h-sub').textContent=cfg.sub;
+  document.getElementById('h-logo').textContent=cfg.logo;
+  document.getElementById('h-deadline').textContent=cfg.dl;
+  document.getElementById('dash-head').textContent=cfg.dh;
+  document.getElementById('form-heading').textContent=cfg.fh;
+  document.getElementById('form-subheading').textContent=cfg.fs;
+  document.getElementById('pin-logo').textContent=cfg.logo;
+}
+function lBrand(){rBrand();applyBrand();}
+function syncInputs(){
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  s('cfg-ep',cfg.ep||'');s('cfg-title',cfg.title);s('cfg-sub',cfg.sub);
+  s('cfg-logo',cfg.logo);s('cfg-dl',cfg.dl);s('cfg-dh',cfg.dh);
+  s('cfg-fh',cfg.fh);s('cfg-fs',cfg.fs);
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+function ST(t){
+  ['submit','dashboard','responses','master'].forEach(id=>{
+    const el=document.getElementById('tab-'+id);if(el)el.style.display=id===t?'block':'none';
+  });
+  document.querySelectorAll('.ntab').forEach(el=>el.classList.remove('act'));
+  document.querySelectorAll('.ntab').forEach(el=>{
+    if(el.getAttribute('onclick')&&el.getAttribute('onclick').includes("'"+t+"'"))el.classList.add('act');
+  });
+  if(t==='submit'){curSec=0;rFormSteps();rFormSection();}
+  if(t==='dashboard'){rDash();rTable();}
+  if(t==='responses')rResp();
+  if(t==='master'){syncInputs();rMasterCl();rCatList();rFB();}
+}
+
+// ── PIN ────────────────────────────────────────────────────────
+let pbuf='';
+function openPin(){pbuf='';upd();document.getElementById('pin-err').textContent='';document.getElementById('pin-ov').style.display='flex';}
+function pk(d){if(pbuf.length>=4)return;pbuf+=d;upd();if(pbuf.length===4)setTimeout(chk,200);}
+function pd(){pbuf=pbuf.slice(0,-1);upd();document.getElementById('pin-err').textContent='';}
+function upd(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);d.classList.toggle('on',i<pbuf.length);d.classList.remove('err');}}
+function chk(){
+  if(pbuf===cfg.pin){
+    isAdmin=true;document.getElementById('pin-ov').style.display='none';
+    document.getElementById('aln-btn').style.display='none';
+    document.getElementById('aout-btn').style.display='flex';
+    injAdm();ST('responses');toast('Admin access granted');
+  }else{
+    document.getElementById('pin-err').textContent='Incorrect PIN';
+    for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.add('err');
+    setTimeout(()=>{pbuf='';upd();},800);
+  }
+}
+function injAdm(){
+  const nav=document.getElementById('main-nav');
+  if(document.getElementById('tab-btn-r'))return;
+  const r=document.createElement('button');r.className='ntab adm';r.id='tab-btn-r';
+  r.innerHTML='All Responses <span class="albl">Admin</span>';r.setAttribute('onclick',"ST('responses')");
+  const m=document.createElement('button');m.className='ntab adm';m.id='tab-btn-m';
+  m.innerHTML='⚙ Master Sheet <span class="albl">Admin</span>';m.setAttribute('onclick',"ST('master')");
+  nav.appendChild(r);nav.appendChild(m);
+}
+function alogout(){
+  isAdmin=false;document.getElementById('aln-btn').style.display='flex';
+  document.getElementById('aout-btn').style.display='none';
+  ['tab-btn-r','tab-btn-m'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});
+  ST('submit');toast('Logged out');
+}
+function chPin(){
+  const np=document.getElementById('new-pin').value.trim(),cp=document.getElementById('cnf-pin').value.trim();
+  const m=document.getElementById('pin-msg');m.style.display='block';
+  if(!/^\d{4}$/.test(np)){m.textContent='PIN must be 4 digits';m.style.color='var(--red)';return;}
+  if(np!==cp){m.textContent='PINs do not match';m.style.color='var(--red)';return;}
+  cfg.pin=np;scfg();m.textContent='PIN updated! Save All Changes to sync.';m.style.color='var(--green)';
+  document.getElementById('new-pin').value='';document.getElementById('cnf-pin').value='';
+  setTimeout(()=>m.style.display='none',4000);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function allSch(){
+  const dis=cfg.disabledCats||[];
+  return cfg.clusters.flatMap(c=>(cfg.schools[c]||[]).map(s=>{
+    const o=typeof s==='object'?s:{name:s,category:''};
+    return {school:o.name,cluster:c,category:o.category||''};
+  })).filter(x=>!dis.includes(x.category));
+}
+function rDash(){
+  const all=allSch(),tot=all.length,dn=Object.keys(subs).length,pct=tot?Math.round(dn/tot*100):0;
+  const sc=document.getElementById('stats');
+  if(sc)sc.innerHTML=`
+    <div class="sc"><div class="slbl">Total Schools</div><div class="sval">${tot}</div><div class="ss">${cfg.clusters.length} clusters</div></div>
+    <div class="sc sg-g"><div class="slbl">Submitted</div><div class="sval">${dn}</div><div class="ss">${pct}% done</div></div>
+    <div class="sc sg-r"><div class="slbl">Pending</div><div class="sval">${tot-dn}</div><div class="ss">${100-pct}% remaining</div></div>
+    <div class="sc sg-y"><div class="slbl">Clusters Complete</div><div class="sval">${cfg.clusters.filter(c=>(cfg.schools[c]||[]).every(s=>subs[typeof s==='object'?s.name:s])).length}</div><div class="ss">of ${cfg.clusters.length}</div></div>`;
+  const pf=document.getElementById('prog-fill');if(pf)pf.style.width=pct+'%';
+  const pl=document.getElementById('prog-lbl');if(pl)pl.textContent=`${dn} / ${tot}`;
+  rDashDrops();
+}
+function rDashDrops(){
+  ['f-cl','r-cl'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;el.innerHTML='<option value="">All Clusters</option>';
+    cfg.clusters.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;el.appendChild(o);});
+    el.value=cur;
+  });
+}
+function setF(f){dashF=f;['all','sub','pend'].forEach(id=>document.getElementById('f-'+id).classList.remove('act'));document.getElementById('f-'+{all:'all',submitted:'sub',pending:'pend'}[f]).classList.add('act');rTable();}
+function fCluster(v){dashCl=v;rTable();}
+function rTable(){
+  const search=(document.getElementById('f-srch')||{}).value?.toLowerCase()||'';
+  const cat=(document.getElementById('f-cat')||{}).value||'';
+  let rows=allSch();
+  if(dashCl)rows=rows.filter(x=>x.cluster===dashCl);
+  if(dashF==='submitted')rows=rows.filter(x=>subs[x.school]);
+  if(dashF==='pending')rows=rows.filter(x=>!subs[x.school]);
+  if(cat)rows=rows.filter(x=>x.category===cat);
+  if(search)rows=rows.filter(x=>x.school.toLowerCase().includes(search)||x.cluster.toLowerCase().includes(search));
+  const tb=document.getElementById('dtbl'),emp=document.getElementById('demp');
+  if(!tb||!emp)return;
+  if(!rows.length){tb.innerHTML='';emp.style.display='block';return;}
+  emp.style.display='none';
+  const nf=getField('name')||getField('nm')||{label:'Name'};
+  tb.innerHTML=rows.map((x,i)=>{
+    const s=subs[x.school];
+    const nm=s?Object.values(s.fields||{})[0]||'':'';
+    return `<tr>
+      <td class="mono">${i+1}</td>
+      <td style="font-weight:500;font-size:12px">${x.school}</td>
+      <td>${catB(x.category)}</td>
+      <td style="font-size:12px;color:var(--muted)">${x.cluster}</td>
+      <td>${s?`<span class="badge bg"><span class="dot dg"></span>Submitted</span>`:`<span class="badge br"><span class="dot dr"></span>Pending</span>`}</td>
+      <td style="font-size:12px">${nm||'<span style="color:var(--light)">—</span>'}</td>
+      <td class="mono" style="font-size:11px">${s?s.time||'':'<span style="color:var(--light)">—</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+function getField(hint){
+  for(const sec of cfg.sections||[]){
+    const f=sec.fields.find(f=>f.id.includes(hint)||f.label.toLowerCase().includes(hint));
+    if(f)return f;
+  }
+  return null;
+}
+
+// ── RESPONSES ─────────────────────────────────────────────────
+function rResp(){
+  const cl=(document.getElementById('r-cl')||{}).value||'';
+  const cat=(document.getElementById('r-cat')||{}).value||'';
+  const s=(document.getElementById('r-srch')||{}).value?.toLowerCase()||'';
+  let rows=allSch().filter(x=>subs[x.school]);
+  if(cl)rows=rows.filter(x=>x.cluster===cl);
+  if(cat)rows=rows.filter(x=>x.category===cat);
+  if(s)rows=rows.filter(x=>x.school.toLowerCase().includes(s)||x.cluster.toLowerCase().includes(s));
+  const tb=document.getElementById('rtbl'),emp=document.getElementById('remp');
+  if(!tb||!emp)return;
+  if(!rows.length){tb.innerHTML='';emp.style.display='block';return;}
+  emp.style.display='none';
+  tb.innerHTML=rows.map((x,i)=>{
+    const sub=subs[x.school];
+    const nm=Object.values(sub.fields||{})[0]||'—';
+    return `<tr>
+      <td class="mono">${i+1}</td>
+      <td style="font-weight:500;font-size:12px">${x.school}</td>
+      <td>${catB(x.category)}</td>
+      <td style="font-size:12px;color:var(--muted)">${x.cluster}</td>
+      <td style="font-size:12px">${nm}</td>
+      <td class="mono" style="font-size:11px">${sub.time||''}</td>
+      <td><button class="ibtn" onclick="openDet('${esc(x.school)}')">View</button></td>
+      <td><button class="dbtn" onclick="delEnt('${esc(x.school)}')">Delete</button></td>
+    </tr>`;
+  }).join('');
+}
+async function delEnt(school){
+  if(!confirm(`Delete submission from "${school}"?`))return;
+  try{await apiPost({action:'deleteSubmission',school});delete subs[school];rResp();rDash();rTable();toast('Deleted.');}
+  catch(e){toast('Error: '+e.message);}
+}
+function openDet(school){
+  const sub=subs[school];if(!sub)return;
+  const frows=Object.entries(sub.fields||{}).map(([k,v])=>`<div class="drow"><div class="dlbl">${k}</div><div class="dval">${v||'—'}</div></div>`).join('');
+  let grid='';
+  if(sub.gridData&&Object.keys(sub.gridData).length){
+    const acts=Object.keys(sub.gridData);
+    const rws=Object.keys(sub.gridData[acts[0]]||{});
+    const th='<tr style="background:var(--navy)"><th style="padding:7px 10px;color:#e2e8f0;font-size:10px;text-align:left">Row</th>'+acts.map(a=>`<th style="padding:7px 8px;color:#e2e8f0;font-size:10px">${a}</th>`).join('')+'</tr>';
+    const trs=rws.map(r=>`<tr><td style="font-weight:600;color:var(--navy);padding:7px 10px;font-size:12px">${r}</td>${acts.map(a=>`<td style="padding:7px 8px;font-size:12px;border-bottom:1px solid var(--border)">${sub.gridData[a]?.[r]??''}</td>`).join('')}</tr>`).join('');
+    grid=`<div style="overflow-x:auto;margin-top:14px;border:1px solid var(--border);border-radius:var(--r)"><table style="border-collapse:collapse;width:100%;font-size:12px"><thead>${th}</thead><tbody>${trs}</tbody></table></div>`;
+  }
+  document.getElementById('modal-body').innerHTML=`
+    <div class="mhdr">
+      <div><div style="font-weight:600;font-size:16px">${school}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${sub.cluster||''} · ${sub.time||''}</div></div>
+      <button class="mclose" onclick="closeModal()">✕</button>
+    </div>${frows}<div style="font-weight:600;font-size:13px;margin-top:16px;margin-bottom:6px">Activity Data</div>${grid||'<div style="font-size:12px;color:var(--muted)">No grid data.</div>'}`;
+  document.getElementById('modal').style.display='flex';
+}
+function closeModal(){document.getElementById('modal').style.display='none';}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function expStatus(){
+  const h=['School','Category','Cluster','Status','Submitted By','Submitted At'];
+  const rows=[h];
+  allSch().forEach(x=>{const s=subs[x.school];rows.push([x.school,x.category,x.cluster,s?'Submitted':'Pending',s?Object.values(s.fields||{})[0]||'':'',s?s.time||'':'']);});
+  dlCSV(rows,'Status.csv');
+}
+function expFull(){
+  const allF=allSch().filter(x=>subs[x.school]);
+  if(!allF.length){toast('No submissions to export');return;}
+  const fKeys=Object.keys(allF[0]?subs[allF[0].school]?.fields||{}:{});
+  const gActs=Object.keys(subs[allF[0]?.school]?.gridData||{});
+  const gRws=gActs.length?Object.keys(subs[allF[0].school].gridData[gActs[0]]||{}):[]; 
+  const gHdrs=gActs.flatMap(a=>gRws.map(r=>`${a} [${r}]`));
+  const rows=[['School','Category','Cluster','Submitted At',...fKeys,...gHdrs]];
+  allF.forEach(x=>{
+    const s=subs[x.school];
+    const fv=fKeys.map(k=>s.fields[k]||'');
+    const gv=gActs.flatMap(a=>gRws.map(r=>s.gridData?.[a]?.[r]??''));
+    rows.push([x.school,x.category,x.cluster,s.time||'',...fv,...gv]);
+  });
+  dlCSV(rows,'FullData.csv');
+}
+function dlCSV(rows,name){
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'));
+  a.download=name;a.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+// FORM ENGINE — renders sections, updates live from form builder
+// ══════════════════════════════════════════════════════════════
+// ── ROUTING HELPERS (Google Forms style) ──────────────────────
+function resolveNextSec(fromSec){
+  const sec=cfg.sections[fromSec];
+  if(!sec)return fromSec+1;
+  for(const f of(sec.fields||[])){
+    if(f.type==='select'&&f.optionRoutes){
+      const val=fdata[f.id];
+      if(val&&f.optionRoutes[val])return routeTarget(f.optionRoutes[val],fromSec);
+    }
+  }
+  if(sec.afterSection&&sec.afterSection!=='next')return routeTarget(sec.afterSection,fromSec);
+  return fromSec+1;
+}
+function routeTarget(route,fromSec){
+  if(route==='submit')return 9999;
+  if(route&&route.startsWith('si_'))return parseInt(route.slice(3));
+  return fromSec+1;
+}
+function secRouteOpts(currentSi,forAfter){
+  const secs=cfg.sections||[];
+  let h='<option value="next">▶ Continue to next section</option>';
+  secs.forEach((s,si)=>{
+    if(forAfter&&si===currentSi)return;
+    h+=`<option value="si_${si}">→ Section ${si+1}: ${esc(s.title||'Untitled')}</option>`;
+  });
+  h+='<option value="submit">✅ Submit form</option>';
+  return h;
+}
+function rFormSteps(){
+  const secs=cfg.sections||[];
+  const wrap=document.getElementById('form-steps');if(!wrap)return;
+  if(secs.length<=1){wrap.innerHTML='';return;}
+  let h='<div class="steps">';
+  secs.forEach((sec,i)=>{
+    const done=i<curSec,active=i===curSec;
+    const dc=done?'done':active?'active':'todo';
+    h+=`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <div class="sdot ${dc}">${done?'✓':i+1}</div>
+      <div class="slbl2" style="color:${done?'var(--green)':active?'var(--navy)':'var(--light)'}">${esc(sec.title||'Section '+(i+1))}</div>
+    </div>`;
+    if(i<secs.length-1)h+=`<div class="sline" style="background:${i<curSec?'var(--green)':'var(--border)'}"></div>`;
+  });
+  h+='</div>';
+  wrap.innerHTML=h;
+}
+
+function rFormSection(){
+  const secs=cfg.sections||[];
+  if(!secs.length){
+    document.getElementById('form-body').innerHTML='<div style="color:var(--muted);font-size:13px">No sections. Contact admin.</div>';
+    return;
+  }
+  const sec=secs[curSec];
+  const isLast=curSec===secs.length-1;
+  const isFirst=curSec===0;
+
+  let h='';
+  if(sec.title)h+=`<div style="font-size:15px;font-weight:600;margin-bottom:4px">${esc(sec.title)}</div>`;
+  if(sec.description)h+=`<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5">${esc(sec.description)}</div>`;
+
+  (sec.fields||[]).forEach(f=>{h+=buildFieldHtml(f);});
+  document.getElementById('form-body').innerHTML=h;
+
+  // Wire up cluster→school
+  const csel=document.querySelector('[data-ftype="cluster_select"]');
+  if(csel)csel.addEventListener('change',()=>populateFormSchool());
+
+  // Restore saved values
+  (sec.fields||[]).forEach(f=>{
+    if(f.type==='datagrid'||f.type==='cluster_select')return;
+    const el=document.getElementById('ff_'+f.id);
+    if(el&&fdata[f.id]!==undefined)el.value=fdata[f.id];
+  });
+  // Restore cluster then school
+  const clf=sec.fields.find(f=>f.type==='cluster_select');
+  const schf=sec.fields.find(f=>f.type==='school_select');
+  if(clf&&fdata[clf.id]){const el=document.getElementById('ff_'+clf.id);if(el){el.value=fdata[clf.id];populateFormSchool();setTimeout(()=>{if(schf&&fdata[schf.id]){const el2=document.getElementById('ff_'+schf.id);if(el2)el2.value=fdata[schf.id];}},60);}}
+
+  // Nav buttons
+  const bk=document.getElementById('fbk'),nx=document.getElementById('fnxt'),sb=document.getElementById('fsbm'),cl=document.getElementById('fclr');
+  if(bk)bk.style.display=isFirst?'none':'flex';
+  if(nx)nx.style.display=isLast?'none':'flex';
+  if(sb)sb.style.display=isLast?'flex':'none';
+  if(cl)cl.style.display=isFirst?'block':'none';
+}
+
+function buildFieldHtml(f){
+  const req=f.required?'<span class="req">*</span>':'';
+  let inp='';
+  if(f.type==='cluster_select'){
+    const dis=cfg.disabledCats||[];
+    let opts='<option value="">— Select Cluster —</option>';
+    cfg.clusters.forEach(c=>{opts+=`<option value="${esc(c)}">${esc(c)}</option>`;});
+    inp=`<select id="ff_${f.id}" data-ftype="cluster_select" onchange="populateFormSchool()" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none">${opts}</select>`;
+  }else if(f.type==='school_select'){
+    inp=`<select id="ff_${f.id}" onchange="onSchSel('${f.id}')" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option value="">— Select School —</option></select>
+    <div id="cat-disp-${f.id}" style="display:none;margin-top:5px;font-size:12px;color:var(--muted)">Category: <span id="cat-val-${f.id}"></span></div>`;
+  }else if(f.type==='textarea'){
+    inp=`<textarea id="ff_${f.id}" rows="3" placeholder="${esc(f.label)}" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;resize:vertical"></textarea>`;
+  }else if(f.type==='yesno'){
+    inp=`<select id="ff_${f.id}" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option value="">— Select —</option><option value="Yes">Yes</option><option value="No">No</option></select>`;
+  }else if(f.type==='select'&&f.options){
+    const opts=(f.options||[]).map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+    inp=`<select id="ff_${f.id}" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option value="">— Select —</option>${opts}</select>`;
+  }else if(f.type==='file'){
+    const accept=fAccept(f),maxF=f.maxFiles||1,maxM=f.maxSizeMB||10;
+    inp=`<div class="fupbox" onclick="document.getElementById('fu_${f.id}').click()" ondragover="event.preventDefault();this.style.borderColor='var(--sky)'" ondragleave="this.style.borderColor=''" ondrop="event.preventDefault();this.style.borderColor='';fDrop(event,'${f.id}',${maxF},${maxM},'${accept}')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" style="margin-bottom:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div style="font-size:13px;color:var(--muted)">Click or drag &amp; drop</div>
+      <div style="font-size:11px;color:var(--light);margin-top:3px">Max ${maxF} file${maxF>1?'s':''} · ${maxM}MB</div>
+    </div>
+    <input type="file" id="fu_${f.id}" accept="${accept}" ${maxF>1?'multiple':''} style="display:none" onchange="fSel(this,'${f.id}',${maxF},${maxM})">
+    <div id="fp_${f.id}" class="fprev"></div>
+    <div id="fpr_${f.id}" style="display:none;margin-top:6px;font-size:12px;color:var(--blue)"></div>`;
+  }else if(f.type==='datagrid'){
+    const cols=(f.columns||[]);const rows=(f.rows||[]);
+    let tbl=`<div class="dgw"><table class="dg2"><thead><tr><th style="text-align:left;min-width:100px">Row / Activity</th>`;
+    cols.forEach(c=>tbl+=`<th style="min-width:80px">${esc(c.label||c)}<div style="font-size:9px;opacity:.7">${TL[c.type]||''}</div></th>`);
+    tbl+=`</tr></thead><tbody>`;
+    rows.forEach((row,ri)=>{
+      const rl=row.label||row,rt=row.type||'number';
+      tbl+=`<tr><td class="rlbl">${esc(rl)}<div style="font-size:9px;color:var(--light)">${TL[rt]||''}</div></td>`;
+      cols.forEach((_,ci)=>{
+        const cid=`ff_${f.id}_${ri}_${ci}`;
+        const gv=(gridState['${f.id}']||{})[ri]?.[ci]||'';
+        if(rt==='yesno')tbl+=`<td><select id="${cid}" onchange="saveGV('${f.id}',${ri},${ci},this.value)" style="width:100%;padding:6px;border:none;font-size:12px;font-family:inherit;background:transparent;outline:none"><option value="">—</option><option${gv==='Yes'?' selected':''}>Yes</option><option${gv==='No'?' selected':''}>No</option></select></td>`;
+        else if(rt==='url')tbl+=`<td><input type="url" id="${cid}" value="${gv}" oninput="saveGV('${f.id}',${ri},${ci},this.value)" placeholder="https://..." style="width:100%;padding:7px 8px;border:none;font-size:11px;font-family:inherit;background:transparent;outline:none;color:var(--blue)"></td>`;
+        else if(rt==='date')tbl+=`<td><input type="date" id="${cid}" value="${gv}" oninput="saveGV('${f.id}',${ri},${ci},this.value)" style="width:100%;padding:6px;border:none;font-size:11px;font-family:inherit;background:transparent;outline:none"></td>`;
+        else if(rt==='number')tbl+=`<td><input type="number" min="0" id="${cid}" value="${gv}" oninput="saveGV('${f.id}',${ri},${ci},this.value)" placeholder="0" style="width:100%;padding:7px 8px;border:none;font-size:12px;font-family:inherit;background:transparent;outline:none"></td>`;
+        else tbl+=`<td><input type="text" id="${cid}" value="${gv}" oninput="saveGV('${f.id}',${ri},${ci},this.value)" placeholder="—" style="width:100%;padding:7px 8px;border:none;font-size:12px;font-family:inherit;background:transparent;outline:none"></td>`;
+      });
+      tbl+=`</tr>`;
+    });
+    tbl+=`</tbody></table></div>`;
+    return `<div style="margin-bottom:16px">${f.label?`<div style="font-size:13px;font-weight:500;margin-bottom:6px">${esc(f.label)} ${req}</div>`:''}${tbl}</div>`;
+  }else{
+    inp=`<input id="ff_${f.id}" type="${f.type}" placeholder="${esc(f.label)}" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none">`;
+  }
+  return `<div class="fgrp"><label>${esc(f.label)} ${req}</label>${inp}</div>`;
+}
+
+function populateFormSchool(){
+  const sec=cfg.sections[curSec];if(!sec)return;
+  const clf=sec.fields.find(f=>f.type==='cluster_select');
+  const schf=sec.fields.find(f=>f.type==='school_select');
+  if(!clf||!schf)return;
+  const csel=document.getElementById('ff_'+clf.id);
+  const ssel=document.getElementById('ff_'+schf.id);
+  if(!csel||!ssel)return;
+  const cluster=csel.value;
+  if(clf)fdata[clf.id]=cluster;
+  ssel.innerHTML='<option value="">— Select School —</option>';
+  if(!cluster||!cfg.schools[cluster])return;
+  const dis=cfg.disabledCats||[];
+  const byCat={};
+  cfg.schools[cluster].forEach(s=>{
+    const o=typeof s==='object'?s:{name:s,category:''};
+    if(dis.includes(o.category))return;
+    if(!byCat[o.category])byCat[o.category]=[];
+    byCat[o.category].push(o);
+  });
+  ['Sr. Sec.','High','Middle','Primary',''].forEach(cat=>{
+    if(!byCat[cat]||!byCat[cat].length)return;
+    const grp=document.createElement('optgroup');grp.label='── '+(cat||'Other')+' ──';
+    byCat[cat].forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=s.name;grp.appendChild(o);});
+    ssel.appendChild(grp);
+  });
+}
+function onSchSel(fid){
+  const el=document.getElementById('ff_'+fid);if(!el)return;
+  fdata[fid]=el.value;
+  const disp=document.getElementById('cat-disp-'+fid),val=document.getElementById('cat-val-'+fid);
+  if(!disp||!val)return;
+  const sec=cfg.sections[curSec];const clf=sec?.fields.find(f=>f.type==='cluster_select');
+  const cluster=clf?fdata[clf.id]||'':'';
+  if(cluster&&el.value&&cfg.schools[cluster]){
+    const found=cfg.schools[cluster].find(s=>(typeof s==='object'?s.name:s)===el.value);
+    if(found&&found.category){
+      const st=CAT_ST[found.category]||{bg:'#f1f5f9',cl:'#64748b'};
+      val.innerHTML=`<span style="background:${st.bg};color:${st.cl};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500">${found.category}</span>`;
+      disp.style.display='block';return;
+    }
+  }
+  disp.style.display='none';
+}
+
+// ── FORM NAVIGATION ───────────────────────────────────────────
+function saveSecData(){
+  const sec=cfg.sections[curSec];if(!sec)return;
+  sec.fields.forEach(f=>{
+    if(f.type==='datagrid'||f.type==='file')return;
+    const el=document.getElementById('ff_'+f.id);if(el)fdata[f.id]=el.value;
+  });
+}
+function fNext(){
+  const sec=cfg.sections[curSec];if(!sec)return;
+  const err=document.getElementById('ferr');if(err)err.style.display='none';
+  for(const f of sec.fields){
+    if(f.type==='datagrid')continue;
+    if(f.type==='file'){if(f.required&&!(uploads[f.id]||[]).length){showE(`Please upload a file for "${f.label}".`);return;}continue;}
+    const el=document.getElementById('ff_'+f.id);if(!el)continue;
+    const v=el.value.trim();
+    if(f.required&&!v){showE(`"${f.label}" is required.`);return;}
+    if(f.type==='tel'&&v&&!/^[0-9]{7,15}$/.test(v.replace(/\s/g,''))){showE('Enter a valid phone number.');return;}
+  }
+  saveSecData();
+  const nextIdx=resolveNextSec(curSec);
+  if(nextIdx===9999||nextIdx>=cfg.sections.length){fSubmit();return;}
+  curSec=nextIdx;
+  rFormSteps();rFormSection();
+  document.getElementById('tab-submit').scrollIntoView({behavior:'smooth'});
+}
+function fBack(){
+  saveSecData();
+  curSec=Math.max(0,curSec-1);
+  rFormSteps();rFormSection();
+  document.getElementById('tab-submit').scrollIntoView({behavior:'smooth'});
+}
+function fBack(){
+  saveSecData();curSec--;rFormSteps();rFormSection();
+  document.getElementById('tab-submit').scrollIntoView({behavior:'smooth'});
+}
+function saveGV(fid,ri,ci,val){
+  if(!gridState[fid])gridState[fid]={};
+  if(!gridState[fid][ri])gridState[fid][ri]={};
+  gridState[fid][ri][ci]=val;
+}
+function fClear(){fdata={};uploads={};driveLinks={};gridState={};curSec=0;rFormSteps();rFormSection();}
+function showE(m){const el=document.getElementById('ferr');if(!el)return;el.textContent=m;el.style.display='block';setTimeout(()=>el.style.display='none',4500);}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────
+// Max file size via portal (must match MAX_UPLOAD_MB in Code.gs)
+const PORTAL_MAX_MB = 30;
+
+function fAccept(f){const m={image:'image/*',pdf:'application/pdf',doc:'.doc,.docx,.xls,.xlsx,.ppt,.pptx','image,pdf':'image/*,application/pdf','image,doc':'image/*,.doc,.docx,.xls,.xlsx,.ppt,.pptx',any:'*'};return m[f.allowedTypes||'any']||'*';}
+function fSel(inp,fid,maxF,maxM){processF(Array.from(inp.files),fid,maxF,maxM);inp.value='';}
+function fDrop(e,fid,maxF,maxM,accept){processF(Array.from(e.dataTransfer.files),fid,maxF,maxM);}
+function processF(files,fid,maxF,maxM){
+  if(!uploads[fid])uploads[fid]=[];
+  // Effective max: lower of field setting and portal hard limit
+  const effMax=Math.min(maxM,PORTAL_MAX_MB);
+  for(const f of files){
+    if(uploads[fid].length>=maxF){showE(`Max ${maxF} files allowed.`);break;}
+    const fileMB=f.size/1024/1024;
+    if(fileMB>effMax){
+      // For large videos, offer the Google Drive link fallback
+      const isVideo=f.type.startsWith('video/');
+      if(isVideo){
+        showLargeFileHelper(fid,f.name,fileMB,effMax);
+      }else{
+        showE(`"${f.name}" is ${fileMB.toFixed(1)}MB — exceeds the ${effMax}MB limit. Please compress the file and try again.`);
+      }
+      continue;
+    }
+    uploads[fid].push(f);
+  }
+  rPrev(fid);
+}
+
+// Shows a helper box for large video files with Drive link input
+function showLargeFileHelper(fid,fname,sizeMB,limitMB){
+  const w=document.getElementById('fp_'+fid);if(!w)return;
+  // Check if helper already shown
+  if(document.getElementById('lf-help-'+fid))return;
+  const box=document.createElement('div');
+  box.id='lf-help-'+fid;
+  box.style.cssText='background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:12px;color:#854d0e';
+  box.innerHTML=`<div style="font-weight:600;margin-bottom:6px">📹 Video too large (${sizeMB.toFixed(1)}MB &gt; ${limitMB}MB limit)</div>
+    <div style="margin-bottom:8px">For MP4 videos, upload directly to Google Drive and paste the shareable link below:</div>
+    <div style="display:flex;gap:6px">
+      <input id="lf-inp-${fid}" type="url" placeholder="Paste Google Drive / YouTube link here..." 
+        style="flex:1;padding:7px 10px;border:1px solid #fde68a;border-radius:6px;font-size:12px;font-family:inherit;outline:none;background:#fff">
+      <button onclick="addDriveLink('${fid}')" 
+        style="padding:7px 12px;background:#854d0e;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">Add Link</button>
+    </div>
+    <div style="margin-top:6px;font-size:11px;color:#a16207">
+      How to get Drive link: Upload to Drive → Right-click → Share → Anyone with link → Copy link
+    </div>`;
+  w.appendChild(box);
+}
+
+// Stores a manually entered Drive link as a "virtual upload"
+function addDriveLink(fid){
+  const inp=document.getElementById('lf-inp-'+fid);if(!inp)return;
+  const url=inp.value.trim();
+  if(!url){showE('Please paste a valid link.');return;}
+  if(!url.startsWith('http')){showE('Link must start with http:// or https://');return;}
+  if(!driveLinks[fid])driveLinks[fid]=[];
+  driveLinks[fid].push(url);
+  inp.value='';
+  const box=document.getElementById('lf-help-'+fid);if(box)box.remove();
+  rPrev(fid);
+  toast('Drive link added ✓');
+}
+
+function rPrev(fid){
+  const w=document.getElementById('fp_'+fid);if(!w)return;
+  const fileItems=(uploads[fid]||[]).map((f,i)=>`<div class="fitem">
+    <span style="font-size:16px">${f.type.startsWith('image')?'🖼':f.type.startsWith('video')?'🎬':'📄'}</span>
+    <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:500">${esc(f.name)}</div><div style="font-size:10px;color:var(--muted)">${(f.size/1024/1024).toFixed(2)}MB</div></div>
+    <button onclick="uploads['${fid}'].splice(${i},1);rPrev('${fid}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px">×</button>
+  </div>`).join('');
+  const linkItems=(driveLinks[fid]||[]).map((url,i)=>`<div class="fitem">
+    <span style="font-size:16px">🔗</span>
+    <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:500;color:var(--blue)">${url}</div><div style="font-size:10px;color:var(--muted)">External link</div></div>
+    <button onclick="driveLinks['${fid}'].splice(${i},1);rPrev('${fid}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px">×</button>
+  </div>`).join('');
+  // Preserve large-file helper if present
+  const helper=document.getElementById('lf-help-'+fid);
+  w.innerHTML=fileItems+linkItems;
+  if(helper)w.appendChild(helper);
+}
+
+async function b64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
+
+async function upFiles(fid,label){
+  const files=uploads[fid]||[];
+  const links=(driveLinks[fid]||[]).slice(); // already-collected external links
+  const pr=document.getElementById('fpr_'+fid);if(pr)pr.style.display='block';
+
+  for(let i=0;i<files.length;i++){
+    const f=files[i];
+    if(pr)pr.textContent=`Uploading ${i+1}/${files.length}: ${f.name}…`;
+    try{
+      const d=await b64(f);
+      const r=await apiPost({action:'uploadFile',fileName:f.name,mimeType:f.type,data:d,folder:label});
+      if(r.link)links.push(r.link);
+      else if(r.viewLink)links.push(r.viewLink);
+      else if(r.error)throw new Error(r.error);
+      if(r.warning)toast(r.warning,'err');
+    }catch(e){
+      showE('Upload failed: '+e.message);
+      if(pr)pr.style.display='none';
+      return null;
+    }
+  }
+  if(pr)pr.style.display='none';
+  return links.join(', ');
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+async function submitForm(){
+  if(submitting)return;
+  saveSecData();
+  // Collect all data
+  let school='',cluster='',fields={},gridData={};
+  for(const sec of(cfg.sections||[])){
+    for(const f of sec.fields){
+      if(f.type==='cluster_select')cluster=fdata[f.id]||'';
+      else if(f.type==='school_select')school=fdata[f.id]||'';
+      else if(f.type==='datagrid'){
+        const cols=f.columns||[];const rows=f.rows||[];
+        cols.forEach((col,ci)=>{
+          const cl=`${f.label} » ${col.label||col}`;gridData[cl]={};
+          rows.forEach((row,ri)=>{
+            const rl=row.label||row;
+            gridData[cl][rl]=(gridState[f.id]?.[ri]?.[ci])||'';
+          });
+        });
+      }else if(f.type!=='file'){fields[f.label]=fdata[f.id]||'';}
+    }
+  }
+  if(!cluster){showE('Please go back and select a cluster.');return;}
+  if(!school){showE('Please go back and select a school.');return;}
+  // Upload files
+  for(const sec of(cfg.sections||[])){
+    for(const f of sec.fields){
+      if(f.type!=='file')continue;
+      const lnk=await upFiles(f.id,f.label);
+      if(lnk===null){return;}
+      fields[f.label]=lnk;
+    }
+  }
+  if(!cfg.ep){showE('Portal not connected to Google Sheets. Contact admin.');return;}
+  submitting=true;
+  const btn=document.getElementById('fsbm');if(btn){btn.innerHTML='<span class="spin"></span> Submitting...';btn.disabled=true;}
+  try{
+    const r=await apiPost({action:'submit',school,cluster,fields,gridData,
+      activities:Object.keys(gridData),rowLabels:Object.keys(Object.values(gridData)[0]||{}),
+      contactFieldLabels:Object.keys(fields)});
+    subs[school]={cluster,fields,gridData,time:r.time||new Date().toLocaleString('en-IN')};
+    const s=document.getElementById('fsuc');
+    if(s){s.textContent=`"${school}" submitted successfully!`;s.style.display='block';setTimeout(()=>s.style.display='none',5000);}
+    toast('Submitted to Google Sheets!');fClear();
+  }catch(e){showE('Submission failed: '+e.message);}
+  finally{submitting=false;if(btn){btn.textContent='Submit Report';btn.disabled=false;}}
+}
+
+// ══════════════════════════════════════════════════════════════
+// FORM BUILDER
+// ══════════════════════════════════════════════════════════════
+function rFB(){
+  const list=document.getElementById('fb-list');if(!list)return;
+  if(!cfg.sections)cfg.sections=JSON.parse(JSON.stringify(DEF_SECTIONS));
+  list.innerHTML='';
+  cfg.sections.forEach((sec,si)=>{
+    const card=document.createElement('div');card.className='sec-card';
+    card.innerHTML=`
+      <div class="sec-hdr">
+        <span style="color:#94a3b8;font-size:11px;font-weight:600;flex-shrink:0">SEC ${si+1}</span>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <input value="${esc(sec.title||'')}" placeholder="Section Title" oninput="cfg.sections[${si}].title=this.value;rFormSteps();rFormSection()" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-family:inherit;outline:none;width:100%">
+          <input value="${esc(sec.description||'')}" placeholder="Description (optional)" oninput="cfg.sections[${si}].description=this.value;rFormSection()" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-family:inherit;outline:none;width:100%">
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          ${si>0?`<button class="shbtn" onclick="fbMoveSec(${si},-1)">↑</button>`:''}
+          ${si<cfg.sections.length-1?`<button class="shbtn" onclick="fbMoveSec(${si},1)">↓</button>`:''}
+          <button class="shbtn del" onclick="fbDelSec(${si})">×</button>
+        </div>
+      </div>
+      <div id="fb-flds-${si}"></div>
+      <div class="sec-footer">
+        <input id="fb-nl-${si}" placeholder="Field label..." onkeydown="if(event.key==='Enter')fbAddFld(${si})">
+        <select id="fb-nt-${si}">${Object.entries(FT).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>
+        <button onclick="fbAddFld(${si})">+ Add Field</button>
+      </div>`;
+    list.appendChild(card);
+    rFBFields(si);
+  });
+}
+
+function rFBFields(si){
+  const wrap=document.getElementById('fb-flds-'+si);if(!wrap)return;
+  const sec=cfg.sections[si];wrap.innerHTML='';
+  if(!sec.fields||!sec.fields.length){
+    wrap.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--light);font-style:italic">No fields. Add below.</div>';
+    return;
+  }
+  sec.fields.forEach((f,fi)=>{
+    const div=document.createElement('div');div.className='fld-row';
+    // Extra settings for special types
+    let extra='';
+    if(f.type==='datagrid'){
+      extra=`<div class="fld-extra">
+        <div class="fld-extra-title">Columns (Activities)</div>
+        <div id="fb-cols-${si}-${fi}"></div>
+        <div class="add-item-row">
+          <input id="fb-nc-${si}-${fi}" placeholder="Column name...">
+          <select id="fb-nct-${si}-${fi}">${['number','text','url','yesno','date'].map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+          <button onclick="fbAddCol(${si},${fi})">+ Column</button>
+        </div>
+        <div class="fld-extra-title" style="margin-top:10px">Rows</div>
+        <div id="fb-rows-${si}-${fi}"></div>
+        <div class="add-item-row">
+          <input id="fb-nr-${si}-${fi}" placeholder="Row name...">
+          <select id="fb-nrt-${si}-${fi}">${['number','text','url','yesno','date'].map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+          <button onclick="fbAddRow(${si},${fi})">+ Row</button>
+        </div>
+      </div>`;
+    }
+    if(f.type==='select'){
+      extra=`<div class="fld-extra">
+        <div class="fld-extra-title">Options (comma separated)</div>
+        <input value="${esc((f.options||[]).join(', '))}" placeholder="Option A, Option B, Option C" oninput="cfg.sections[${si}].fields[${fi}].options=this.value.split(',').map(s=>s.trim()).filter(Boolean);rFormSection()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none">
+      </div>`;
+    }
+    if(f.type==='file'){
+      extra=`<div class="fld-extra">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div><div class="fld-extra-title">Max Files</div><input type="number" min="1" max="10" value="${f.maxFiles||1}" oninput="cfg.sections[${si}].fields[${fi}].maxFiles=parseInt(this.value)||1;rFormSection()" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none"></div>
+          <div><div class="fld-extra-title">Max MB</div><input type="number" min="1" max="100" value="${f.maxSizeMB||10}" oninput="cfg.sections[${si}].fields[${fi}].maxSizeMB=parseInt(this.value)||10;rFormSection()" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none"></div>
+          <div><div class="fld-extra-title">File Types</div>
+            <select oninput="cfg.sections[${si}].fields[${fi}].allowedTypes=this.value;rFormSection()" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none">
+              ${['any','image','pdf','doc','image,pdf'].map(t=>`<option value="${t}"${f.allowedTypes===t?' selected':''}>${t==='any'?'Any':t==='image'?'Images':t==='pdf'?'PDF':t==='doc'?'Word/Excel/PPT':'Images+PDF'}</option>`).join('')}
+            </select></div>
+        </div>
+      </div>`;
+    }
+    div.innerHTML=`<div class="fld-num">${fi+1}</div>
+      <div class="fld-main">
+        <div class="fld-ctrl">
+          <input type="text" value="${esc(f.label)}" placeholder="Field label" oninput="cfg.sections[${si}].fields[${fi}].label=this.value;rFormSection()">
+          <select oninput="cfg.sections[${si}].fields[${fi}].type=this.value;rFBFields(${si});rFormSection()">
+            ${Object.entries(FT).map(([v,l])=>`<option value="${v}"${f.type===v?' selected':''}>${l}</option>`).join('')}
+          </select>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap">
+            <input type="checkbox" ${f.required?'checked':''} onchange="cfg.sections[${si}].fields[${fi}].required=this.checked;rFormSection()"> Required
+          </label>
+          ${fi>0?`<button class="fcbtn" onclick="fbMoveFld(${si},${fi},-1);rFormSection()" title="Move up">↑</button>`:''}
+          ${fi<sec.fields.length-1?`<button class="fcbtn" onclick="fbMoveFld(${si},${fi},1);rFormSection()" title="Move down">↓</button>`:''}
+          <button class="fcbtn del" onclick="fbDelFld(${si},${fi});rFormSection()" title="Delete">×</button>
+        </div>
+        ${extra}
+      </div>`;
+    wrap.appendChild(div);
+    if(f.type==='datagrid'){rFBCols(si,fi);rFBRows(si,fi);}
+  });
+}
+function rFBCols(si,fi){
+  const w=document.getElementById(`fb-cols-${si}-${fi}`);if(!w)return;
+  const cols=(cfg.sections[si].fields[fi].columns||[]);
+  w.innerHTML=cols.map((c,ci)=>`<div class="grid-row">
+    <input value="${esc(c.label||c)}" oninput="if(!cfg.sections[${si}].fields[${fi}].columns[${ci}].label)cfg.sections[${si}].fields[${fi}].columns[${ci}]={label:this.value,type:'number'};else cfg.sections[${si}].fields[${fi}].columns[${ci}].label=this.value;rFormSection()">
+    <select oninput="cfg.sections[${si}].fields[${fi}].columns[${ci}].type=this.value;rFormSection()">${['number','text','url','yesno','date'].map(t=>`<option value="${t}"${(c.type||'number')===t?' selected':''}>${t}</option>`).join('')}</select>
+    <button class="x" onclick="cfg.sections[${si}].fields[${fi}].columns.splice(${ci},1);rFBCols(${si},${fi});rFormSection()">×</button>
+  </div>`).join('');
+}
+function rFBRows(si,fi){
+  const w=document.getElementById(`fb-rows-${si}-${fi}`);if(!w)return;
+  const rows=(cfg.sections[si].fields[fi].rows||[]);
+  w.innerHTML=rows.map((r,ri)=>`<div class="grid-row">
+    <input value="${esc(r.label||r)}" oninput="if(!cfg.sections[${si}].fields[${fi}].rows[${ri}].label)cfg.sections[${si}].fields[${fi}].rows[${ri}]={label:this.value,type:'number'};else cfg.sections[${si}].fields[${fi}].rows[${ri}].label=this.value;rFormSection()">
+    <select oninput="cfg.sections[${si}].fields[${fi}].rows[${ri}].type=this.value;rFormSection()">${['number','text','url','yesno','date'].map(t=>`<option value="${t}"${(r.type||'number')===t?' selected':''}>${t}</option>`).join('')}</select>
+    <button class="x" onclick="cfg.sections[${si}].fields[${fi}].rows.splice(${ri},1);rFBRows(${si},${fi});rFormSection()">×</button>
+  </div>`).join('');
+}
+function fbAddCol(si,fi){const v=document.getElementById(`fb-nc-${si}-${fi}`).value.trim();if(!v)return;const t=document.getElementById(`fb-nct-${si}-${fi}`).value;if(!cfg.sections[si].fields[fi].columns)cfg.sections[si].fields[fi].columns=[];cfg.sections[si].fields[fi].columns.push({label:v,type:t});document.getElementById(`fb-nc-${si}-${fi}`).value='';rFBCols(si,fi);rFormSection();}
+function fbAddRow(si,fi){const v=document.getElementById(`fb-nr-${si}-${fi}`).value.trim();if(!v)return;const t=document.getElementById(`fb-nrt-${si}-${fi}`).value;if(!cfg.sections[si].fields[fi].rows)cfg.sections[si].fields[fi].rows=[];cfg.sections[si].fields[fi].rows.push({label:v,type:t});document.getElementById(`fb-nr-${si}-${fi}`).value='';rFBRows(si,fi);rFormSection();}
+function fbAddSec(){if(!cfg.sections)cfg.sections=[];cfg.sections.push({id:uid(),title:'New Section',description:'',fields:[]});rFB();rFormSteps();}
+function fbDelSec(si){if(!confirm(`Delete Section ${si+1}?`))return;cfg.sections.splice(si,1);rFB();rFormSteps();rFormSection();}
+function fbMoveSec(si,d){const a=cfg.sections,j=si+d;if(j<0||j>=a.length)return;[a[si],a[j]]=[a[j],a[si]];rFB();rFormSteps();rFormSection();}
+function fbAddFld(si){const v=document.getElementById('fb-nl-'+si).value.trim();if(!v)return;const t=document.getElementById('fb-nt-'+si).value;const f={id:uid(),label:v,type:t,required:false};if(t==='select')f.options=[];if(t==='file'){f.maxFiles=1;f.maxSizeMB=10;f.allowedTypes='any';}if(t==='datagrid'){f.columns=[];f.rows=[];}cfg.sections[si].fields.push(f);document.getElementById('fb-nl-'+si).value='';rFBFields(si);rFormSection();}
+function fbDelFld(si,fi){cfg.sections[si].fields.splice(fi,1);rFBFields(si);}
+function fbMoveFld(si,fi,d){const a=cfg.sections[si].fields,j=fi+d;if(j<0||j>=a.length)return;[a[fi],a[j]]=[a[j],a[fi]];rFBFields(si);}
+
+// ── MASTER NAV ─────────────────────────────────────────────────
+function showMS(id,el){
+  document.querySelectorAll('.mpsec').forEach(s=>s.classList.remove('act'));
+  document.querySelectorAll('.mi').forEach(s=>s.classList.remove('act'));
+  document.getElementById('ms-'+id).classList.add('act');el.classList.add('act');
+}
+
+// ── CLUSTERS EDITOR ───────────────────────────────────────────
+function rMasterCl(){
+  const list=document.getElementById('cl-list');if(!list)return;
+  document.getElementById('cl-count').textContent=cfg.clusters.length;
+  list.innerHTML='';
+  cfg.clusters.forEach((c,i)=>{
+    const item=document.createElement('div');item.className='ce-item'+(selCl===c?' sel':'');
+    item.innerHTML=`<input value="${esc(c)}" onclick="selCl='${esc(c)}';rMasterCl()" onchange="rnCl(${i},this.value)" style="cursor:pointer"><button class="xdel" onclick="delCl(${i})">×</button>`;
+    list.appendChild(item);
+  });
+  rSchList();
+}
+function rSchList(){
+  const list=document.getElementById('sch-list');if(!list)return;
+  const schs=selCl&&cfg.schools[selCl]?cfg.schools[selCl]:[];
+  document.getElementById('sch-count').textContent=schs.length;
+  const lbl=document.getElementById('sel-cl-lbl');if(lbl)lbl.textContent=selCl||'—';
+  list.innerHTML='';
+  schs.forEach((s,i)=>{
+    const o=typeof s==='object'?s:{name:s,category:''};
+    const st=CAT_ST[o.category]||{bg:'#f1f5f9',cl:'#64748b'};
+    const item=document.createElement('div');item.className='ce-item';
+    item.innerHTML=`<input value="${esc(o.name)}" onchange="rnSch(${i},this.value)"><span class="cat-span" style="background:${st.bg};color:${st.cl}">${o.category||'—'}</span><button class="xdel" onclick="delSch(${i})">×</button>`;
+    list.appendChild(item);
+  });
+}
+function rnCl(i,v){const old=cfg.clusters[i];cfg.clusters[i]=v;if(cfg.schools[old]){cfg.schools[v]=cfg.schools[old];delete cfg.schools[old];}if(selCl===old)selCl=v;rDashDrops();}
+function addCl(){const n=document.getElementById('new-cl').value.trim();if(!n)return;cfg.clusters.push(n);cfg.schools[n]=[];document.getElementById('new-cl').value='';selCl=n;rMasterCl();rDashDrops();}
+function delCl(i){if(!confirm(`Remove "${cfg.clusters[i]}"?`))return;const c=cfg.clusters.splice(i,1)[0];if(selCl===c)selCl=cfg.clusters[0]||null;rMasterCl();rDashDrops();}
+function rnSch(i,v){if(!selCl)return;const s=cfg.schools[selCl][i];if(typeof s==='object')s.name=v;else cfg.schools[selCl][i]=v;}
+function addSch(){if(!selCl){toast('Select a cluster first');return;}const n=document.getElementById('new-sch').value.trim();if(!n)return;const cat=document.getElementById('new-sch-cat').value;if(!cfg.schools[selCl])cfg.schools[selCl]=[];cfg.schools[selCl].push({name:n,category:cat});document.getElementById('new-sch').value='';rSchList();rMasterCl();}
+function delSch(i){cfg.schools[selCl].splice(i,1);rSchList();rMasterCl();}
+
+// ── CATEGORY TOGGLES ─────────────────────────────────────────
+function rCatList(){
+  const w=document.getElementById('cat-list');if(!w)return;
+  const dis=cfg.disabledCats||[];
+  const cats=['Sr. Sec.','High','Middle','Primary'];
+  const labels={'Sr. Sec.':'Sr. Secondary (GSSS/GGSSS)','High':'High School (GHS)','Middle':'Middle School (GMS)','Primary':'Primary School (GPS/GMSPS)'};
+  const counts={};cats.forEach(c=>{counts[c]=0;});
+  cfg.clusters.forEach(cl=>(cfg.schools[cl]||[]).forEach(s=>{const cat=typeof s==='object'?s.category:'';if(counts[cat]!==undefined)counts[cat]++;}));
+  w.innerHTML=cats.map(cat=>{
+    const on=!dis.includes(cat);const st=CAT_ST[cat]||{bg:'#f1f5f9',cl:'#64748b'};
+    return `<div class="tog-item">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:12px;height:12px;border-radius:50%;background:${st.cl}"></div>
+        <div>
+          <div style="font-size:13px;font-weight:500">${labels[cat]}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${counts[cat]} schools</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;font-weight:500;color:${on?'var(--green)':'var(--red)'}">${on?'Enabled':'Disabled'}</span>
+        <div class="tog" style="background:${on?'var(--green)':'#e2e8f0'}" onclick="togCat('${cat}')">
+          <div class="tog-knob" style="${on?'right:2px':'left:2px'}"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function togCat(cat){
+  if(!cfg.disabledCats)cfg.disabledCats=[];
+  const i=cfg.disabledCats.indexOf(cat);
+  if(i>-1)cfg.disabledCats.splice(i,1);else cfg.disabledCats.push(cat);
+  rCatList();rDash();rTable();
+}
+
+// ── DANGER ────────────────────────────────────────────────────
+function clearLocal(){subs={};rDash();rTable();toast('Cache cleared.');}
+function resetCfg(){if(!confirm('Reset all config?'))return;cfg=buildDef();scfg();applyAll();toast('Config reset.');}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(m,t){const el=document.getElementById('toast');el.textContent=m;el.style.background=t==='err'?'var(--red)':'var(--navy)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init(){
+  applyBrand();
+  if(cfg.clusters.length)selCl=cfg.clusters[0];
+  ST('submit');
+  if(cfg.ep){
+    await loadRemoteCfg();
+    loadSheets();
+  }else{
+    setConn('err','Not connected. Go to Admin → Master Sheet → Google Sheets Setup.');
+  }
+}
+init();
+
+// ── AUTO REFRESH (every 5 minutes) ────────────────────────────
+setInterval(async()=>{
+  if(!cfg.ep)return;
+  try{await loadRemoteCfg();await loadSheets();}catch(e){}
+}, 5 * 60 * 1000);
+
+// ── iOS SAFARI FIX ────────────────────────────────────────────
+document.addEventListener('visibilitychange',async()=>{
+  if(document.visibilityState==='visible'&&cfg.ep){
+    try{await loadRemoteCfg();await loadSheets();}catch(e){}
+  }
+});
+window.addEventListener('pageshow',(e)=>{
+  if(e.persisted&&cfg.ep){loadRemoteCfg().then(()=>loadSheets()).catch(()=>{});}
+});
+
+</script>
+</body>
+</html>
